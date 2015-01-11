@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<sounds>
+    <!--
+    <sound id="MusicTheme">resources/audio/game/music/Theme.mp3</sound>
+    <sound id="Engine">resources/audio/game/engine.wav</sound>
+    <sound id="EngineLoop">resources/audio/game/engineLoop.wav</sound>
+    <sound id="Lap">resources/audio/game/lap.wav</sound>
+    <sound id="EngineSlow">resources/audio/game/engineSlow.wav</sound>
+    <sound id="Horn">resources/audio/game/horn.wav</sound>
+    <sound id="Turn">resources/audio/game/turn.wav</sound>
+    <sound id="RaceStart">resources/audio/game/raceStart.mp3</sound>
+    <sound id="RaceFinish">resources/audio/game/raceFinish.mp3</sound>
+    <sound id="RaceWin">resources/audio/game/raceWin.mp3</sound>
+    <sound id="RaceLose">resources/audio/game/raceLose.mp3</sound>
+    -->
+</sounds>
