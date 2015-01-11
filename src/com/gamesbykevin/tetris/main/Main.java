@@ -1,12 +1,12 @@
-package com.gamesbykevin.rcproam.main;
+package com.gamesbykevin.tetris.main;
 
 import java.awt.*;
 import javax.swing.*;
 
 import com.gamesbykevin.framework.resources.Disposable;
 
-import com.gamesbykevin.rcproam.engine.Engine;
-import com.gamesbykevin.rcproam.shared.Shared;
+import com.gamesbykevin.tetris.engine.Engine;
+import com.gamesbykevin.tetris.shared.Shared;
 
 public final class Main extends Thread implements Disposable
 {

@@ -1,7 +1,7 @@
 import javax.swing.JApplet;
 
-import com.gamesbykevin.rcproam.main.Main;
-import com.gamesbykevin.rcproam.shared.Shared;
+import com.gamesbykevin.tetris.main.Main;
+import com.gamesbykevin.tetris.shared.Shared;
 
 /**
  * WE NEED THIS CLASS HERE FOR JAVA APPLETS OUTSIDE A PACKAGE SO IT CAN FIND THE STARTING POINT

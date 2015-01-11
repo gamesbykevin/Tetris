@@ -1,27 +1,23 @@
-package com.gamesbykevin.rcproam.resources;
+package com.gamesbykevin.tetris.resources;
 
-import com.gamesbykevin.framework.resources.TextManager;
+import com.gamesbykevin.framework.resources.FontManager;
 
-/**
- * All audio for game
- * @author GOD
- */
-public final class GameText extends TextManager
+public final class GameFont extends FontManager
 {
     //description for progress bar
-    private static final String DESCRIPTION = "Loading Game Text Resources";
+    private static final String DESCRIPTION = "Loading Font Resources";
     
     /**
      * These are the keys used to access the resources and need to match the id in the xml file
      */
     public enum Keys
     {
-        
+        Default
     }
     
-    public GameText() throws Exception
+    public GameFont() throws Exception
     {
-        super(Resources.XML_CONFIG_GAME_TEXT);
+        super(Resources.XML_CONFIG_GAME_FONT);
         
         //the description that will be displayed for the progress bar
         super.setProgressDescription(DESCRIPTION);

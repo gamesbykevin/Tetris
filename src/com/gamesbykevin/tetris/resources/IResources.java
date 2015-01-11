@@ -1,4 +1,4 @@
-package com.gamesbykevin.rcproam.resources;
+package com.gamesbykevin.tetris.resources;
 
 import com.gamesbykevin.framework.resources.Disposable;
 

@@ -1,15 +1,16 @@
-package com.gamesbykevin.rcproam.manager;
+package com.gamesbykevin.tetris.manager;
 
 import com.gamesbykevin.framework.input.Keyboard;
 import com.gamesbykevin.framework.menu.Menu;
 import com.gamesbykevin.framework.util.*;
 
-import com.gamesbykevin.rcproam.engine.Engine;
-import com.gamesbykevin.rcproam.menu.CustomMenu;
-import com.gamesbykevin.rcproam.menu.CustomMenu.*;
-import com.gamesbykevin.rcproam.resources.*;
-import java.awt.Color;
+import com.gamesbykevin.tetris.engine.Engine;
+import com.gamesbykevin.tetris.menu.CustomMenu;
+import com.gamesbykevin.tetris.menu.CustomMenu.*;
 
+import com.gamesbykevin.tetris.player.*;
+
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -22,6 +23,9 @@ public final class Manager implements IManager
 {
     //where gameplay occurs
     private Rectangle window;
+    
+    //the player
+    private Player player;
     
     /**
      * Constructor for Manager, this is the point where we load any menu option configurations
@@ -43,7 +47,11 @@ public final class Manager implements IManager
     @Override
     public void reset(final Engine engine) throws Exception
     {
-        
+        if (player == null)
+        {
+            player = new Human();
+            player.getBoard().setLocation(0, 0);
+        }
     }
     
     @Override
@@ -67,6 +75,12 @@ public final class Manager implements IManager
         if (window != null)
             window = null;
         
+        if (player != null)
+        {
+            player.dispose();
+            player = null;
+        }
+        
         try
         {
             //recycle objects
@@ -86,7 +100,10 @@ public final class Manager implements IManager
     @Override
     public void update(final Engine engine) throws Exception
     {
-        
+        if (player != null)
+        {
+            player.update(engine);
+        }
     }
     
     /**
@@ -96,6 +113,9 @@ public final class Manager implements IManager
     @Override
     public void render(final Graphics graphics)
     {
-        
+        if (player != null)
+        {
+            player.render(graphics);
+        }
     }
 }

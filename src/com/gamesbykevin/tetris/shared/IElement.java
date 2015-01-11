@@ -1,8 +1,8 @@
-package com.gamesbykevin.rcproam.shared;
+package com.gamesbykevin.tetris.shared;
 
 import com.gamesbykevin.framework.resources.Disposable;
 
-import com.gamesbykevin.rcproam.engine.Engine;
+import com.gamesbykevin.tetris.engine.Engine;
 
 import java.awt.Graphics;
 

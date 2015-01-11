@@ -1,4 +1,4 @@
-package com.gamesbykevin.rcproam.shared;
+package com.gamesbykevin.tetris.shared;
 
 import java.awt.Cursor;
 import java.awt.Point;

@@ -1,5 +1,5 @@
-import com.gamesbykevin.rcproam.main.Main;
-import com.gamesbykevin.rcproam.shared.Shared;
+import com.gamesbykevin.tetris.main.Main;
+import com.gamesbykevin.tetris.shared.Shared;
 
 import java.awt.Dimension;
 import javax.swing.JFrame;

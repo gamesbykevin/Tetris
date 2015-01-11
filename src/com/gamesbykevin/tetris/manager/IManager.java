@@ -1,7 +1,7 @@
-package com.gamesbykevin.rcproam.manager;
+package com.gamesbykevin.tetris.manager;
 
 import com.gamesbykevin.framework.resources.Disposable;
-import com.gamesbykevin.rcproam.engine.Engine;
+import com.gamesbykevin.tetris.engine.Engine;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
