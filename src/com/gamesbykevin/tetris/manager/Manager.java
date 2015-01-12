@@ -25,7 +25,7 @@ public final class Manager implements IManager
     private Rectangle window;
     
     //the player
-    private Player player;
+    private Players players;
     
     /**
      * Constructor for Manager, this is the point where we load any menu option configurations
@@ -47,10 +47,9 @@ public final class Manager implements IManager
     @Override
     public void reset(final Engine engine) throws Exception
     {
-        if (player == null)
+        if (players == null)
         {
-            player = new Human();
-            player.getBoard().setLocation(0, 0);
+            players = new Players();
         }
     }
     
@@ -75,10 +74,10 @@ public final class Manager implements IManager
         if (window != null)
             window = null;
         
-        if (player != null)
+        if (players != null)
         {
-            player.dispose();
-            player = null;
+            players.dispose();
+            players = null;
         }
         
         try
@@ -100,9 +99,9 @@ public final class Manager implements IManager
     @Override
     public void update(final Engine engine) throws Exception
     {
-        if (player != null)
+        if (players != null)
         {
-            player.update(engine);
+            players.update(engine);
         }
     }
     
@@ -113,9 +112,9 @@ public final class Manager implements IManager
     @Override
     public void render(final Graphics graphics)
     {
-        if (player != null)
+        if (players != null)
         {
-            player.render(graphics);
+            players.render(graphics);
         }
     }
 }

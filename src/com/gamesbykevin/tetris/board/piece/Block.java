@@ -38,7 +38,7 @@ public final class Block extends Cell implements Disposable
         setId(id);
         
         //assign the color of the block
-        this.color = color;
+        setColor(color);
     }
     
     /**
@@ -54,6 +54,11 @@ public final class Block extends Cell implements Disposable
     private void setId(final long id)
     {
         this.id = id;
+    }
+    
+    public void setColor(final Color color)
+    {
+        this.color = color;
     }
     
     public Color getColor()

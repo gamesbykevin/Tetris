@@ -47,7 +47,7 @@ public final class Piece extends Sprite implements Disposable
         //call to parent constructor
         super();
         
-        //assign the base location
+        //assign the start base location
         super.setCol(col);
         super.setRow(row);
         
@@ -60,10 +60,10 @@ public final class Piece extends Sprite implements Disposable
              * Straight line
              */
             case PIECE_ONE:
+                add(-2, 0, PIECE_ONE_COLOR);
+                add(-1, 0, PIECE_ONE_COLOR);
                 add(0, 0, PIECE_ONE_COLOR);
                 add(1, 0, PIECE_ONE_COLOR);
-                add(2, 0, PIECE_ONE_COLOR);
-                add(3, 0, PIECE_ONE_COLOR);
                 break;
                 
             /**
@@ -75,7 +75,6 @@ public final class Piece extends Sprite implements Disposable
                 add(1, 1, PIECE_TWO_COLOR);
                 add(2, 1, PIECE_TWO_COLOR);
                 break;
-                
                 
             /**
              * L
@@ -91,10 +90,10 @@ public final class Piece extends Sprite implements Disposable
              * Square
              */
             case PIECE_FOUR:
+                add(-1,  0, PIECE_FOUR_COLOR);
                 add(0,  0, PIECE_FOUR_COLOR);
-                add(1,  0, PIECE_FOUR_COLOR);
                 add(0,  1, PIECE_FOUR_COLOR);
-                add(1,  1, PIECE_FOUR_COLOR);
+                add(-1,  1, PIECE_FOUR_COLOR);
                 break;
                 
             /**

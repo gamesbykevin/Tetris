@@ -29,71 +29,66 @@ public final class Human extends Player implements Disposable
     @Override
     public void update(final Engine engine) throws Exception
     {
-        //if the human does not have a tetris piece, create one
-        if (super.getPiece() == null)
+        //update common elements
+        super.updateBasic(engine);
+
+        if (getPiece() != null)
         {
-            super.createPiece(Piece.PIECES[engine.getRandom().nextInt(Piece.PIECES.length)]);
-        }
-        else
-        {
-            //update common elements
-            super.updateBasic(engine);
-            
             //get keyboard input
             final Keyboard keyboard = engine.getKeyboard();
-            
-            if (keyboard.hasKeyReleased(KeyEvent.VK_LEFT))
+
+            if (keyboard.hasKeyPressed(KeyEvent.VK_LEFT))
             {
                 //move piece west
                 getPiece().decreaseCol();
-                
+
                 //if we are out of bounds or intersecting another block on the board
                 if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
                 {
                     //move piece back to previous
                     getPiece().increaseCol();
                 }
-                
+
                 //remove the event
-                keyboard.removeKeyReleased(KeyEvent.VK_LEFT);
+                keyboard.removeKeyPressed(KeyEvent.VK_LEFT);
             }
-            else if (keyboard.hasKeyReleased(KeyEvent.VK_RIGHT))
+            else if (keyboard.hasKeyPressed(KeyEvent.VK_RIGHT))
             {
                 //move piece east
                 getPiece().increaseCol();
-                
+
                 //if we are out of bounds or intersecting another block on the board
                 if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
                 {
                     //move piece back to previous
                     getPiece().decreaseCol();
                 }
-                
+
                 //remove the event
-                keyboard.removeKeyReleased(KeyEvent.VK_RIGHT);
+                keyboard.removeKeyPressed(KeyEvent.VK_RIGHT);
             }
-            else if (keyboard.hasKeyReleased(KeyEvent.VK_UP))
+            else if (keyboard.hasKeyPressed(KeyEvent.VK_UP))
             {
-                //rotate piece
-                getPiece().rotateCounterClockwise();
-                
+                //move piece back to previous
+                getPiece().rotateClockwise();
+
                 //if we are out of bounds or intersecting another block on the board
                 if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
                 {
-                    //move piece back to previous
-                    getPiece().rotateClockwise();
+                    //rotate piece
+                    getPiece().rotateCounterClockwise();
                 }
-                
+
                 //remove the event
-                keyboard.removeKeyReleased(KeyEvent.VK_UP);
+                keyboard.removeKeyPressed(KeyEvent.VK_UP);
             }
-            else if (keyboard.hasKeyReleased(KeyEvent.VK_DOWN))
+            else if (keyboard.hasKeyPressed(KeyEvent.VK_DOWN))
             {
                 //automatically expire timer so piece drops
                 getTimer().setRemaining(0);
-                
+
                 //remove the event
-                keyboard.removeKeyReleased(KeyEvent.VK_DOWN);
+                keyboard.removeKeyPressed(KeyEvent.VK_DOWN);
             }
         }
     }

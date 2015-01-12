@@ -4,12 +4,13 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 
 import com.gamesbykevin.tetris.board.piece.*;
+import com.gamesbykevin.tetris.shared.Shared;
 import java.awt.Color;
 
 import java.awt.Graphics;
 
 /**
- *  This is the board where the tetris pieces will be placed
+ * This is the board where the tetris pieces will be placed
  * @author GOD
  */
 public final class Board extends Sprite implements Disposable
@@ -18,12 +19,18 @@ public final class Board extends Sprite implements Disposable
     private Block[][] board;
     
     //the size of the board
-    private static final int ROWS = 20;
-    private static final int COLS = 10;
+    public static final int ROWS = 20;
+    public static final int COLS = 10;
     
     //the default place to start the piece
     public static final int START_COL = (COLS / 2);
     public static final int START_ROW = 0;
+    
+    //do we have a complete line
+    private boolean complete = false;
+    
+    //the number of lines completed
+    private int lines = 0;
     
     public Board()
     {
@@ -35,6 +42,45 @@ public final class Board extends Sprite implements Disposable
         
         //set the bounds of the board to determine if the location is in bounds
         super.setBounds(0, COLS - 1, 0, ROWS - 1);
+        
+        //reset the board
+        reset();
+    }
+    
+    /**
+     * Set the number of lines completed
+     * @param lines The total number of lines completed overall
+     */
+    private void setLines(final int lines)
+    {
+        this.lines = lines;
+    }
+    
+    /**
+     * Get the number of lines completed
+     * @return The total number of lines completed
+     */
+    public int getLines()
+    {
+        return this.lines;
+    }
+    
+    /**
+     * Mark a line completion
+     * @param complete true if all columns in 1 row have existing blocks
+     */
+    public void setComplete(final boolean complete)
+    {
+        this.complete = complete;
+    }
+    
+    /**
+     * Do we have at least 1 completed line
+     * @return true if at least 1 row is complete, false otherwise
+     */
+    public boolean hasComplete()
+    {
+        return this.complete;
     }
     
     /**
@@ -42,7 +88,7 @@ public final class Board extends Sprite implements Disposable
      * @param piece The piece we want to add
      * @throws Exception If a block already exists in place an exception will be thrown
      */
-    public void add(final Piece piece) throws Exception
+    public void addPiece(final Piece piece) throws Exception
     {
         //if a block exists the piece can't be added
         if (hasBlock(piece))
@@ -59,7 +105,157 @@ public final class Board extends Sprite implements Disposable
             int row = (int)(block.getRow() + piece.getRow());
             
             //add block at location
-            add(col, row, block);
+            setBlock(col, row, block);
+        }
+    }
+    
+    /**
+     * Is the specified row empty
+     * @param row The row we want to check
+     * @return true if all columns are empty for the given row, false otherwise
+     */
+    public boolean hasEmptyRow(final int row)
+    {
+        for (int col = 0; col < board[0].length; col++)
+        {
+            //if a block exists the row is not empty
+            if (hasBlock(col, row))
+                return false;
+        }
+        
+        //all blocks are empty return true
+        return true;
+    }
+    
+    /**
+     * Drop the blocks of all rows that have blocks but have 0 blocks underneath
+     */
+    public void dropBlocks()
+    {
+        //do we check all rows
+        boolean check = true;
+        
+        while(check)
+        {
+            //no longer check all rows
+            check = false;
+            
+            for (int row = 0; row < board.length - 1; row++)
+            {
+                //if the current row is not empty and the one below it is
+                if (!hasEmptyRow(row) && hasEmptyRow(row + 1))
+                {
+                    //move the blocks in the current row to the row below
+                    dropRow(row);
+                    
+                    //we need to check the rows again
+                    check = true;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Move all blocks in the specified row to the row below
+     * @param row The row containing blocks we want to move south
+     */
+    private void dropRow(final int row)
+    {
+        for (int col = 0; col < board[0].length; col++)
+        {
+            if (hasBlock(col, row))
+            {
+                //move the block to the row below
+                board[row + 1][col] = board[row][col];
+                
+                //remove the previous block
+                board[row][col] = null;
+            }
+        }
+    }
+    
+    /**
+     * Is the specified row complete?
+     * @param row The row we want to check
+     * @return true if every column in this row is a block, false otherwise
+     */
+    public boolean hasCompletedRow(final int row)
+    {
+        for (int col = 0; col < board[0].length; col++)
+        {
+            if (!hasBlock(col, row))
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Remove all blocks that are part of a completed row(s).<br>
+     * Will also add the number of completed rows to the total
+     */
+    public void clearCompletedRows()
+    {
+        for (int row = 0; row < board.length; row++)
+        {
+            //if this row has been completed, clear it
+            if (hasCompletedRow(row))
+            {
+                //clear the row
+                clearRow(row);
+                
+                //add 1 to the total # of completed lines
+                setLines(getLines() + 1);
+            }
+        }
+        
+        if (Shared.DEBUG)
+            System.out.println("Lines completed - " + getLines());
+    }
+    
+    /**
+     * Remove all blocks for a given row
+     * @param row The row we want to remove all blocks from
+     */
+    private void clearRow(final int row)
+    {
+        for (int col = 0; col < board[0].length; col++)
+        {
+            //set the location as null
+            setBlock(col, row, null);
+        }
+    }
+    
+    /**
+     * Remove all blocks on the board
+     */
+    public void reset()
+    {
+        //there are no completed lines
+        setComplete(false);
+        
+        for (int row = 0; row < board.length; row++)
+        {
+            clearRow(row);
+        }
+    }
+    
+    /**
+     * Check the board for a completed row and flag if there is at least 1 completed row
+     */
+    public void markCompletedRow()
+    {
+        for (int row = 0; row < board.length; row++)
+        {
+            //if one row has been completed, set complete true
+            if (hasCompletedRow(row))
+            {
+                //flag complete
+                setComplete(true);
+                
+                //exit loop
+                break;
+            }
         }
     }
     
@@ -87,21 +283,12 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Get the board array containing the placed blocks.
-     * @return The board array that may contain blocks
-     */
-    public Block[][] getBlocks()
-    {
-        return this.board;
-    }
-    
-    /**
-     * Add block to the board
+     * Assign the block to the board
      * @param col Column
      * @param row Row
      * @param block The block to be placed
      */
-    private void add(final int col, final int row, final Block block)
+    private void setBlock(final int col, final int row, final Block block)
     {
         this.board[row][col] = block;
     }
@@ -155,7 +342,7 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Draw the board.
+     * Draw the board
      * @param graphics 
      */
     public void render(final Graphics graphics)

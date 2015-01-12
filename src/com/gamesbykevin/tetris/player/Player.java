@@ -24,10 +24,21 @@ public abstract class Player implements Disposable, IElement
     //the current piece in play for the player
     private Piece piece;
     
+    //the next piece to be in play
+    private Piece nextPiece;
+    
     //timer that determines when a piece will drop
     private Timer timer;
     
-    private static final long PIECE_DROP_DELAY = Timers.toNanoSeconds(1000L);
+    //timer that determines how long to display a completed line(s)
+    private Timer complete;
+    
+    //default time between piece drops
+    private static final long DEFAULT_PIECE_DROP_DELAY = Timers.toNanoSeconds(1000L);
+
+    //default time to show a completed line(s)
+    private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
+    
     
     protected Player()
     {
@@ -35,7 +46,10 @@ public abstract class Player implements Disposable, IElement
         this.board = new Board();
         
         //create the timer that controls when the piece falls
-        this.timer = new Timer(PIECE_DROP_DELAY);
+        this.timer = new Timer(DEFAULT_PIECE_DROP_DELAY);
+        
+        //create timer to track completed line
+        this.complete = new Timer(COMPLETED_LINE_DELAY);
     }
     
     public Board getBoard()
@@ -43,29 +57,60 @@ public abstract class Player implements Disposable, IElement
         return this.board;
     }
     
+    protected Piece getNextPiece()
+    {
+        return this.nextPiece;
+    }
+    
     protected Piece getPiece()
     {
         return this.piece;
     }
     
+    protected void assignNextPiece()
+    {
+        //assign the next piece as current
+        this.piece = getNextPiece();
+        
+        //place in starting point
+        this.piece.setCol(Board.START_COL);
+        this.piece.setRow(Board.START_ROW);
+    }
+    
+    /**
+     * Remove the current piece
+     */
     protected void removePiece()
     {
         this.piece = null;
     }
     
     /**
-     * Create a tetris piece of the specified type and at the default starting location
+     * Create a tetris piece of the specified type and at the default starting location.<BR>
      * @param type The type of piece we want to add
      * @throws Exception Exception will be thrown if type does not exist
      */
-    protected void createPiece(final int type) throws Exception
+    protected void createNextPiece(final int type) throws Exception
     {
-        this.piece = new Piece(Board.START_COL, Board.START_ROW, type);
+        this.nextPiece = new Piece(Board.START_COL + Board.COLS, Board.START_ROW, type);
     }
     
+    /**
+     * Get the timer that represents the delay between each piece drop.
+     * @return The timer that represents the delay between each piece drop.
+     */
     protected Timer getTimer()
     {
         return this.timer;
+    }
+    
+    /**
+     * Get the timer that represents the delay to player activity when at least 1 line has been completed.
+     * @return The timer that represents the delay to player activity when at least 1 line has been completed.
+     */
+    protected Timer getCompletedTimer()
+    {
+        return this.complete;
     }
     
     /**
@@ -74,32 +119,74 @@ public abstract class Player implements Disposable, IElement
      */
     protected void updateBasic(final Engine engine) throws Exception
     {
-        //if time has passed move piece down
-        if (getTimer().hasTimePassed())
+        //if the human does not have a tetris piece, create one
+        if (getPiece() == null && !getBoard().hasComplete())
         {
-            //reset timer
-            getTimer().reset();
-            
-            //move piece south
-            getPiece().increaseRow();
-            
-            //if we are out of bounds or intersecting another block on the board
-            if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
-            {
-                //move piece back to previous
-                getPiece().decreaseRow();
-                
-                //add piece to board
-                getBoard().add(getPiece());
-                
-                //now remove the piece
-                removePiece();
-            }
+            //if next piece has been created assign as current
+            if (getNextPiece() != null)
+                assignNextPiece();
+
+            //create the next piece
+            createNextPiece(Piece.PIECES[engine.getRandom().nextInt(Piece.PIECES.length)]);
         }
         else
         {
-            //update timer
-            getTimer().update(engine.getMain().getTime());
+            //if time has passed move piece down
+            if (getTimer().hasTimePassed())
+            {
+                //reset timer
+                getTimer().reset();
+
+                //move piece south
+                getPiece().increaseRow();
+
+                //if we are out of bounds or intersecting another block on the board
+                if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                {
+                    //move piece back to previous
+                    getPiece().decreaseRow();
+
+                    //add piece to board
+                    getBoard().addPiece(getPiece());
+
+                    //check for a complete line
+                    getBoard().markCompletedRow();
+
+                    //now remove the piece
+                    removePiece();
+                }
+            }
+            else
+            {
+                //at least 1 row has been completed
+                if (getBoard().hasComplete())
+                {
+                    if (!getCompletedTimer().hasTimePassed())
+                    {
+                        //update timer until complete
+                        getCompletedTimer().update(engine.getMain().getTime());
+                    }
+                    else
+                    {
+                        //remove completed lines
+                        getBoard().clearCompletedRows();
+
+                        //drop above blocks
+                        getBoard().dropBlocks();
+
+                        //the board no longer has a completed line(s)
+                        getBoard().setComplete(false);
+
+                        //reset timer
+                        getCompletedTimer().reset();
+                    }
+                }
+                else
+                {
+                    //update timer
+                    getTimer().update(engine.getMain().getTime());
+                }
+            }
         }
     }
     
@@ -124,6 +211,18 @@ public abstract class Player implements Disposable, IElement
             piece.dispose();
             piece = null;
         }
+        
+        if (nextPiece != null)
+        {
+            nextPiece.dispose();
+            nextPiece = null;
+        }
+        
+        if (timer != null)
+            timer = null;
+        
+        if (complete != null)
+            complete = null;
     }
     
     @Override
@@ -135,16 +234,29 @@ public abstract class Player implements Disposable, IElement
             getBoard().render(graphics);
         }
         
-        if (getPiece() != null)
+        //only draw the current piece if no lines have been completed
+        if (!getBoard().hasComplete())
         {
-            //calculate the coordinates where the render should start
-            int x = (int)(getBoard().getX() + (getPiece().getCol() * Block.WIDTH));
-            int y = (int)(getBoard().getY() + (getPiece().getRow() * Block.HEIGHT));
-            
-            //render the piece
-            getPiece().render(x, y, graphics);
+            if (getPiece() != null)
+            {
+                //calculate the coordinates where the render should start
+                int x = (int)(getBoard().getX() + (getPiece().getCol() * Block.WIDTH));
+                int y = (int)(getBoard().getY() + (getPiece().getRow() * Block.HEIGHT));
+
+                //render the piece
+                getPiece().render(x, y, graphics);
+            }
         }
         
+        if (getNextPiece() != null)
+        {
+            //calculate the coordinates where the render should start
+            int x = (int)(getBoard().getX() + (getNextPiece().getCol() * Block.WIDTH));
+            int y = (int)(getBoard().getY() + (getNextPiece().getRow() * Block.HEIGHT));
+            
+            //render the piece
+            getNextPiece().render(x, y, graphics);
+        }
         
         //we may draw some common components of the player here??
     }
