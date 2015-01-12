@@ -30,6 +30,17 @@ public final class Players implements Disposable, IElement
         add(player);
     }
     
+    /**
+     * Reset all players, board(s), etc....
+     */
+    public void reset()
+    {
+        for (int i = 0; i < players.size(); i++)
+        {
+            players.get(i).reset();
+        }
+    }
+    
     private void add(final Player player)
     {
         this.players.add(player);

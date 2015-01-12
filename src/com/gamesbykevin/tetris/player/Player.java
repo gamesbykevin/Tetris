@@ -9,6 +9,7 @@ import com.gamesbykevin.tetris.board.piece.Block;
 import com.gamesbykevin.tetris.board.piece.Piece;
 import com.gamesbykevin.tetris.engine.Engine;
 import com.gamesbykevin.tetris.shared.IElement;
+import com.gamesbykevin.tetris.shared.Shared;
 
 import java.awt.Graphics;
 
@@ -25,7 +26,7 @@ public abstract class Player implements Disposable, IElement
     private Piece piece;
     
     //the next piece to be in play
-    private Piece nextPiece;
+    private Piece next;
     
     //timer that determines when a piece will drop
     private Timer timer;
@@ -39,7 +40,6 @@ public abstract class Player implements Disposable, IElement
     //default time to show a completed line(s)
     private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
     
-    
     protected Player()
     {
         //create a new board
@@ -52,6 +52,19 @@ public abstract class Player implements Disposable, IElement
         this.complete = new Timer(COMPLETED_LINE_DELAY);
     }
     
+    public void reset()
+    {
+        //reset board
+        getBoard().reset();
+        
+        //reset timers
+        getTimer().reset();
+        getCompletedTimer().reset();
+        
+        piece = null;
+        next = null;
+    }
+    
     public Board getBoard()
     {
         return this.board;
@@ -59,7 +72,7 @@ public abstract class Player implements Disposable, IElement
     
     protected Piece getNextPiece()
     {
-        return this.nextPiece;
+        return this.next;
     }
     
     protected Piece getPiece()
@@ -92,7 +105,7 @@ public abstract class Player implements Disposable, IElement
      */
     protected void createNextPiece(final int type) throws Exception
     {
-        this.nextPiece = new Piece(Board.START_COL + Board.COLS, Board.START_ROW, type);
+        this.next = new Piece(Board.START_COL + Board.COLS, Board.START_ROW, type);
     }
     
     /**
@@ -168,6 +181,12 @@ public abstract class Player implements Disposable, IElement
                     }
                     else
                     {
+                        //add the completed rows towards the total lines completed count
+                        getBoard().setLines(getBoard().getLines() + getBoard().getCompletedRowCount());
+                        
+                        if (Shared.DEBUG)
+                            System.out.println("Lines completed - " + getBoard().getLines());
+                        
                         //remove completed lines
                         getBoard().clearCompletedRows();
 
@@ -212,10 +231,10 @@ public abstract class Player implements Disposable, IElement
             piece = null;
         }
         
-        if (nextPiece != null)
+        if (next != null)
         {
-            nextPiece.dispose();
-            nextPiece = null;
+            next.dispose();
+            next = null;
         }
         
         if (timer != null)
@@ -257,7 +276,5 @@ public abstract class Player implements Disposable, IElement
             //render the piece
             getNextPiece().render(x, y, graphics);
         }
-        
-        //we may draw some common components of the player here??
     }
 }

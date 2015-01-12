@@ -51,6 +51,10 @@ public final class Manager implements IManager
         {
             players = new Players();
         }
+        else
+        {
+            players.reset();
+        }
     }
     
     @Override

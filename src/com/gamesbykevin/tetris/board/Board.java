@@ -51,7 +51,7 @@ public final class Board extends Sprite implements Disposable
      * Set the number of lines completed
      * @param lines The total number of lines completed overall
      */
-    private void setLines(final int lines)
+    public void setLines(final int lines)
     {
         this.lines = lines;
     }
@@ -81,6 +81,26 @@ public final class Board extends Sprite implements Disposable
     public boolean hasComplete()
     {
         return this.complete;
+    }
+    
+    /**
+     * Remove all the blocks from the board that have the same id as the piece.<br>
+     * @param piece The piece we want to match
+     */
+    public void removePiece(final Piece piece)
+    {
+        for (int row = 0; row < board.length; row++)
+        {
+            for (int col = 0; col < board[0].length; col++)
+            {
+                if (hasBlock(col, row))
+                {
+                    //if the block belongs to the piece, remove it
+                    if (board[row][col].getId() == piece.getId())
+                        setBlock(col, row, null);
+                }
+            }
+        }
     }
     
     /**
@@ -191,6 +211,25 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
+     * Get the completer of rows
+     * @return The total number of rows that have a block across all columns
+     */
+    public int getCompletedRowCount()
+    {
+        int count = 0;
+        
+        for (int row = 0; row < board.length; row++)
+        {
+            //if this row has been completed, add to count
+            if (hasCompletedRow(row))
+                count++;
+        }
+        
+        //return the total count
+        return count;
+    }
+    
+    /**
      * Remove all blocks that are part of a completed row(s).<br>
      * Will also add the number of completed rows to the total
      */
@@ -203,14 +242,8 @@ public final class Board extends Sprite implements Disposable
             {
                 //clear the row
                 clearRow(row);
-                
-                //add 1 to the total # of completed lines
-                setLines(getLines() + 1);
             }
         }
-        
-        if (Shared.DEBUG)
-            System.out.println("Lines completed - " + getLines());
     }
     
     /**
@@ -234,6 +267,10 @@ public final class Board extends Sprite implements Disposable
         //there are no completed lines
         setComplete(false);
         
+        //reset lines completed
+        setLines(0);
+        
+        //clear each row
         for (int row = 0; row < board.length; row++)
         {
             clearRow(row);

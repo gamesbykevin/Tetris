@@ -32,6 +32,7 @@ public final class Human extends Player implements Disposable
         //update common elements
         super.updateBasic(engine);
 
+        //make sure there is a current piece in play
         if (getPiece() != null)
         {
             //get keyboard input
