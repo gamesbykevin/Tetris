@@ -118,63 +118,56 @@ public final class Engine implements KeyListener, MouseMotionListener, MouseList
     @Override
     public void update(Main main) throws Exception
     {
-        try
+        if (menu == null)
         {
-            if (menu == null)
-            {
-                //create new menu
-                menu = new CustomMenu(this);
+            //create new menu
+            menu = new CustomMenu(this);
 
+            //reset mouse and keyboard input
+            resetInput();
+        }
+        else
+        {
+            //does the menu have focus
+            if (!menu.hasFocus())
+            {
                 //reset mouse and keyboard input
                 resetInput();
             }
-            else
+
+            //update the menu
+            menu.update(this);
+
+            //if the menu is finished and the window has focus
+            if (menu.hasFinished() && menu.hasFocus())
             {
-                //does the menu have focus
-                if (!menu.hasFocus())
+                //if our resources object is empty create a new one
+                if (resources == null)
+                    this.resources = new Resources();
+
+                //check if we are still loading resources
+                if (resources.isLoading())
                 {
-                    //reset mouse and keyboard input
-                    resetInput();
+                    //load resources
+                    resources.update(main.getContainerClass());
                 }
-
-                //update the menu
-                menu.update(this);
-
-                //if the menu is finished and the window has focus
-                if (menu.hasFinished() && menu.hasFocus())
+                else
                 {
-                    //if our resources object is empty create a new one
-                    if (resources == null)
-                        this.resources = new Resources();
-
-                    //check if we are still loading resources
-                    if (resources.isLoading())
+                    //create new manager because at this point our resources have loaded
+                    if (manager == null)
                     {
-                        //load resources
-                        resources.update(main.getContainerClass());
+                        manager = new Manager(this);
+                        manager.reset(this);
                     }
-                    else
-                    {
-                        //create new manager because at this point our resources have loaded
-                        if (manager == null)
-                        {
-                            manager = new Manager(this);
-                            manager.reset(this);
-                        }
 
-                        //update main game logic
-                        manager.update(this);
-                    }
+                    //update main game logic
+                    manager.update(this);
                 }
-
-                //if the mouse is released reset all mouse events
-                if (mouse.isMouseReleased())
-                    mouse.reset();
             }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
+
+            //if the mouse is released reset all mouse events
+            if (mouse.isMouseReleased())
+                mouse.reset();
         }
     }
     

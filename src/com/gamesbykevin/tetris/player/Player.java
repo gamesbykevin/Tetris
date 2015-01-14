@@ -244,10 +244,6 @@ public abstract class Player implements Disposable, IElement
                         {
                             //keep track of the rotation
                             setRotations(getRotations() + 1);
-                            
-                            //if we have made 4 rotations, restart counter at 0
-                            if (getRotations() >= Piece.TOTAL_ROTATIONS)
-                                setRotations(0);
                         }
                         
                         //rotation is complete, unflag rotation
@@ -273,14 +269,15 @@ public abstract class Player implements Disposable, IElement
     /**
      * Set the rotation
      * @param rotations The number rotation we are on will range from 0 - 3
-     * @throws Exception If the number of rotations exceeds 3 or is less than 0
      */
     protected void setRotations(final int rotations) throws Exception
     {
-        if (rotations < 0 || rotations >= Piece.TOTAL_ROTATIONS)
-            throw new Exception("Invalid number of rotations set");
-        
+        //assign number
         this.rotations = rotations;
+        
+        //if out of range reset to 0
+        if (rotations < 0 || rotations >= Piece.TOTAL_ROTATIONS)
+            this.rotations = 0;
     }
     
     /**

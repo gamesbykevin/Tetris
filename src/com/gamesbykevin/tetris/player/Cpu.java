@@ -1,6 +1,5 @@
 package com.gamesbykevin.tetris.player;
 
-import com.gamesbykevin.framework.input.Keyboard;
 import com.gamesbykevin.framework.resources.Disposable;
 import com.gamesbykevin.tetris.board.Board;
 import com.gamesbykevin.tetris.board.piece.Piece;
@@ -25,16 +24,16 @@ public final class Cpu extends Player implements Disposable
     private int roationCount;
     
     //the score for each line
-    private static final double BONUS_LINE = 50;
+    private static final double BONUS_LINE = 500;
     
     //the score for each block that is directly place above another
-    private static final double BONUS_BLOCK_COVER = 10;
+    private static final double BONUS_BLOCK_COVER = 50;
     
     //the penalty for creating a hole
     private static final double PENALTY_EMPTY_BLOCK = -100;
     
     //the penalty for the block height
-    private static final double PENALTY_BLOCK_HEIGHT = - 5;
+    private static final double PENALTY_BLOCK_HEIGHT = -50;
     
     public Cpu()
     {
@@ -141,6 +140,11 @@ public final class Cpu extends Player implements Disposable
                 }
             }
         }
+        else
+        {
+            //if there is no current piece, we will need to calculate a new destination when we get one
+            setDestination(false);
+        }
     }
     
     /**
@@ -178,7 +182,7 @@ public final class Cpu extends Player implements Disposable
                     continue;
                 
                 //now check until we find the floor
-                for (int row = 0; row < Board.ROWS; row++)
+                for (int row = 0; row <= Board.ROWS; row++)
                 {
                     //set the new row to check
                     getPiece().setRow(row);
@@ -247,7 +251,7 @@ public final class Cpu extends Player implements Disposable
                             setTargetColumn(col);
                         }
                         
-                        //no need to check any further rows, exit for loop
+                        //no need to check any further rows, exit loop to check the next column
                         break;
                     }
                 }
