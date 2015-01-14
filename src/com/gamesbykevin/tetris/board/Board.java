@@ -320,6 +320,51 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
+     * Get the block count according to the covered parameter.<br>
+     * Covered = true, Count the total number of blocks directly below the piece that either have a block or is the floor.<br>
+     * Covered = false, Count the total number of empty spaces directly below the piece
+     * @param covered If true we are counting blocks directly below, if false counting empty spaces directly below
+     * @param piece The piece we placed on the board
+     * @return The total dependent on the covered parameter
+     */
+    public int getBlockCount(final boolean covered, final Piece piece)
+    {
+        //the count
+        int count = 0;
+        
+        for (int row = 0; row < board.length; row++)
+        {
+            for (int col = 0; col < board[0].length; col++)
+            {
+                //make sure location is within bounds
+                if (hasBounds(col, row))
+                {
+                    //if the piece is part of this location and is also part of the board
+                    if (piece.hasBlock(col, row) && hasBlock(col, row))
+                    {
+                        //are we checking for a filled block directly below
+                        if (covered)
+                        {
+                            //if the bottom floor is below or a block is below add to count
+                            if (!hasBounds(col, row + 1) || hasBlock(col, row + 1))
+                                count++;
+                        }
+                        else
+                        {
+                            //if directly below is in bounds and there is not a block
+                            if (hasBounds(col, row + 1) && !hasBlock(col, row + 1))
+                                count++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        //return the count
+        return count;
+    }
+    
+    /**
      * Assign the block to the board
      * @param col Column
      * @param row Row
@@ -337,14 +382,14 @@ public final class Board extends Sprite implements Disposable
      */
     public boolean hasBlock(final Piece piece)
     {
-        for (int i = 0; i < piece.getBlocks().size(); i++)
+        for (int row = 0; row < board.length; row++)
         {
-            int col = (int)(piece.getBlocks().get(i).getCol() + piece.getCol());
-            int row = (int)(piece.getBlocks().get(i).getRow() + piece.getRow());
-            
-            //if there is a block here return true
-            if (hasBlock(col, row))
-                return true;
+            for (int col = 0; col < board[0].length; col++)
+            {
+                //if a block exists here, and the block is part of the piece
+                if (hasBlock(col, row) && piece.hasBlock(col, row))
+                    return true;
+            }
         }
         
         //no blocks exist here, return false

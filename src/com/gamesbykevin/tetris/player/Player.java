@@ -40,6 +40,12 @@ public abstract class Player implements Disposable, IElement
     //default time to show a completed line(s)
     private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
     
+    //do we rotate the piece
+    private boolean rotate = false;
+    
+    //keep track of the number of rotations
+    private int rotations = 0;
+    
     protected Player()
     {
         //create a new board
@@ -52,7 +58,7 @@ public abstract class Player implements Disposable, IElement
         this.complete = new Timer(COMPLETED_LINE_DELAY);
     }
     
-    public void reset()
+    public void reset() throws Exception
     {
         //reset board
         getBoard().reset();
@@ -63,6 +69,26 @@ public abstract class Player implements Disposable, IElement
         
         piece = null;
         next = null;
+        
+        rotate = false;
+        setRotations(0);
+    }
+    
+    /**
+     * Do we rotate the piece clockwise
+     * @return true - yes, otherwise false
+     */
+    private boolean hasRotate()
+    {
+        return this.rotate;
+    }
+    
+    /**
+     * Flag to rotate the piece once clockwise
+     */
+    protected void rotate()
+    {
+        this.rotate = true;
     }
     
     public Board getBoard()
@@ -202,11 +228,59 @@ public abstract class Player implements Disposable, IElement
                 }
                 else
                 {
+                    //do we rotate the piece
+                    if (hasRotate())
+                    {
+                        //rotate piece
+                        getPiece().rotateClockwise();
+
+                        //if we are out of bounds or intersecting another block on the board
+                        if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                        {
+                            //rotate piece backwards
+                            getPiece().rotateCounterClockwise();
+                        }
+                        else
+                        {
+                            //keep track of the rotation
+                            setRotations(getRotations() + 1);
+                            
+                            //if we have made 4 rotations, restart counter at 0
+                            if (getRotations() >= Piece.TOTAL_ROTATIONS)
+                                setRotations(0);
+                        }
+                        
+                        //rotation is complete, unflag rotation
+                        rotate = false;
+                    }
+                    
                     //update timer
                     getTimer().update(engine.getMain().getTime());
                 }
             }
         }
+    }
+    
+    /**
+     * Get the number of rotations
+     * @return The number of rotations ranging from 0 - 3
+     */
+    protected int getRotations()
+    {
+        return this.rotations;
+    }
+    
+    /**
+     * Set the rotation
+     * @param rotations The number rotation we are on will range from 0 - 3
+     * @throws Exception If the number of rotations exceeds 3 or is less than 0
+     */
+    protected void setRotations(final int rotations) throws Exception
+    {
+        if (rotations < 0 || rotations >= Piece.TOTAL_ROTATIONS)
+            throw new Exception("Invalid number of rotations set");
+        
+        this.rotations = rotations;
     }
     
     /**

@@ -23,7 +23,7 @@ public final class Players implements Disposable, IElement
         this.players = new ArrayList<>();
         
         //create player
-        Player player = new Human();
+        Player player = new Cpu();
         player.getBoard().setLocation(0, 0);
         
         //add player
@@ -33,7 +33,7 @@ public final class Players implements Disposable, IElement
     /**
      * Reset all players, board(s), etc....
      */
-    public void reset()
+    public void reset() throws Exception
     {
         for (int i = 0; i < players.size(); i++)
         {

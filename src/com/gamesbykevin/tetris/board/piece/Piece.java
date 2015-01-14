@@ -2,6 +2,7 @@ package com.gamesbykevin.tetris.board.piece;
 
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
+import com.gamesbykevin.tetris.board.Board;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -16,6 +17,11 @@ public final class Piece extends Sprite implements Disposable
 {
     //the list of blocks that make the tetris piece
     private List<Block> blocks;
+    
+    /**
+     * Each piece can be rotated 4 times
+     */
+    public static final int TOTAL_ROTATIONS = 4;
     
     /**
      * The different possible pieces
@@ -129,6 +135,48 @@ public final class Piece extends Sprite implements Disposable
             default:
                 throw new Exception("Piece is not setup here - " + type);
         }
+    }
+    
+    /**
+     * Is the block part of the piece
+     * @param col column we are searching for
+     * @param row row we are searching for
+     * @return true if the location matches a block, false otherwise
+     */
+    public boolean hasBlock(final int col, final int row)
+    {
+        for (int i = 0; i < getBlocks().size(); i++)
+        {
+            //get the current block
+            final Block block = getBlocks().get(i);
+            
+            //if the location matches, return true
+            if (getCol() + block.getCol() == col && getRow() + block.getRow() == row)
+                return true;
+        }
+        
+        //we did not find a match
+        return false;
+    }
+    
+    /**
+     * Get the total height of this piece.<br>
+     * The very bottom of the board will have a height of 1 and the row above will have a height of 2, etc...
+     * @return The sum of all the rows for each block in the piece
+     */
+    public int getTotalHeight()
+    {
+        //the total height
+        int total = 0;
+        
+        for (int i = 0; i < getBlocks().size(); i++)
+        {
+            //add the height of this block to the total
+            total += (Board.ROWS - (getRow() + getBlocks().get(i).getRow()));
+        }
+        
+        //return the total height
+        return total;
     }
     
     /**

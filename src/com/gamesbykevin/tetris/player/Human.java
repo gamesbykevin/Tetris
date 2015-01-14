@@ -70,16 +70,9 @@ public final class Human extends Player implements Disposable
             }
             else if (keyboard.hasKeyPressed(KeyEvent.VK_UP))
             {
-                //move piece back to previous
-                getPiece().rotateClockwise();
-
-                //if we are out of bounds or intersecting another block on the board
-                if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
-                {
-                    //rotate piece
-                    getPiece().rotateCounterClockwise();
-                }
-
+                //rotate the piece
+                super.rotate();
+                
                 //remove the event
                 keyboard.removeKeyPressed(KeyEvent.VK_UP);
             }
