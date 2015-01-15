@@ -3,6 +3,7 @@ package com.gamesbykevin.tetris.board;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 
+import com.gamesbykevin.tetris.player.Cpu;
 import com.gamesbykevin.tetris.board.piece.*;
 import com.gamesbykevin.tetris.shared.Shared;
 import java.awt.Color;
@@ -112,7 +113,10 @@ public final class Board extends Sprite implements Disposable
     {
         //if a block exists the piece can't be added
         if (hasBlock(piece))
+        {
+            System.out.println("Lines = " + this.getLines());
             throw new Exception("A block already exists here and the piece can't be placed.");
+        }
         
         //add each block to the board
         for (int i = 0; i < piece.getBlocks().size(); i++)
@@ -320,14 +324,11 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Get the block count according to the covered parameter.<br>
-     * Covered = true, Count the total number of blocks directly below the piece that either have a block or is the floor.<br>
-     * Covered = false, Count the total number of empty spaces directly below the piece
-     * @param covered If true we are counting blocks directly below, if false counting empty spaces directly below
-     * @param piece The piece we placed on the board
-     * @return The total dependent on the covered parameter
+     * Get the penalty for blocks placed directly above an empty space
+     * @param piece The piece we placed
+     * @return The total score penalty for empty blocks
      */
-    public int getBlockCount(final boolean covered, final Piece piece)
+    public double getBlockadeScore(final Piece piece)
     {
         //the count
         int count = 0;
@@ -342,26 +343,110 @@ public final class Board extends Sprite implements Disposable
                     //if the piece is part of this location and is also part of the board
                     if (piece.hasBlock(col, row) && hasBlock(col, row))
                     {
-                        //are we checking for a filled block directly below
-                        if (covered)
+                        //if directly below is in bounds and there is not a block
+                        if (hasBounds(col, row + 1) && !hasBlock(col, row + 1))
+                            count++;
+                    }
+                }
+            }
+        }
+        
+        //return the total score
+        return (count * Cpu.PENALTY_BLOCKADE);
+    }
+    
+    /**
+     * Get the penalty for all the holes on the <b>entire</b> board
+     * @return The total score for each block that has an empty space below it.
+     */
+    public double getHolesScore()
+    {
+        double score = 0;
+        
+        for (int row = 0; row < board.length; row++)
+        {
+            for (int col = 0; col < board[0].length; col++)
+            {
+                //make sure current location and below are in bounds
+                if (hasBounds(col, row) && hasBounds(col, row + 1))
+                {
+                    //if we have a block here, but not below it is a hole
+                    if (hasBlock(col, row) && !hasBlock(col, row + 1))
+                        score += Cpu.PENALTY_HOLES;
+                }
+            }
+        }
+        
+        //return the total score
+        return score;
+    }
+    
+    /**
+     * Get the total score for the piece placed.<br>
+     * Will check the following:<br>
+     * 1. Blocks that border each other (west, east, south directions)
+     * 2. Blocks that border the side walls
+     * 3. Blocks that border the floor
+     * @param piece The piece we placed on the board
+     * @return The total score of the piece placed
+     */
+    public double getCoveredBlockScore(final Piece piece)
+    {
+        //our return score
+        double score = 0;
+        
+        for (int row = 0; row < board.length; row++)
+        {
+            for (int col = 0; col < board[0].length; col++)
+            {
+                //make sure location is within bounds
+                if (hasBounds(col, row))
+                {
+                    //also make sure the location is part of the piece
+                    if (piece.hasBlock(col, row))
+                    {
+                        //if we don't have bounds to the left we are touching a wall
+                        if (!hasBounds(col - 1, row))
                         {
-                            //if the bottom floor is below or a block is below add to count
-                            if (!hasBounds(col, row + 1) || hasBlock(col, row + 1))
-                                count++;
+                            score += Cpu.BONUS_WALL_COVER;
                         }
                         else
                         {
-                            //if directly below is in bounds and there is not a block
-                            if (hasBounds(col, row + 1) && !hasBlock(col, row + 1))
-                                count++;
+                            //we are inbounds and have a bordering block, add touching block score
+                            if (hasBlock(col - 1, row))
+                                score += Cpu.BONUS_BLOCK_COVER;
+                        }
+                        
+                        //if we don't have bounds to the right we are touching a wall
+                        if (!hasBounds(col + 1, row))
+                        {
+                            score += Cpu.BONUS_WALL_COVER;
+                        }
+                        else
+                        {
+                            //we are inbounds and have a bordering block, add touching block score
+                            if (hasBlock(col + 1, row))
+                                score += Cpu.BONUS_BLOCK_COVER;
+                        }
+                        
+                        //if we don't have bounds below we are touching the floor
+                        if (!hasBounds(col, row + 1))
+                        {
+                            score += Cpu.BONUS_FLOOR_COVER;
+                        }
+                        else
+                        {
+                            //we are inbounds and have a bordering block, add touching block score
+                            if (hasBlock(col, row + 1))
+                                score += Cpu.BONUS_BLOCK_COVER;
                         }
                     }
                 }
             }
         }
         
-        //return the count
-        return count;
+        //return total score
+        return score;
     }
     
     /**

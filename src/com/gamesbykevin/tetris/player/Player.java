@@ -40,9 +40,6 @@ public abstract class Player implements Disposable, IElement
     //default time to show a completed line(s)
     private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
     
-    //do we rotate the piece
-    private boolean rotate = false;
-    
     //keep track of the number of rotations
     private int rotations = 0;
     
@@ -70,25 +67,7 @@ public abstract class Player implements Disposable, IElement
         piece = null;
         next = null;
         
-        rotate = false;
         setRotations(0);
-    }
-    
-    /**
-     * Do we rotate the piece clockwise
-     * @return true - yes, otherwise false
-     */
-    private boolean hasRotate()
-    {
-        return this.rotate;
-    }
-    
-    /**
-     * Flag to rotate the piece once clockwise
-     */
-    protected void rotate()
-    {
-        this.rotate = true;
     }
     
     public Board getBoard()
@@ -228,32 +207,31 @@ public abstract class Player implements Disposable, IElement
                 }
                 else
                 {
-                    //do we rotate the piece
-                    if (hasRotate())
-                    {
-                        //rotate piece
-                        getPiece().rotateClockwise();
-
-                        //if we are out of bounds or intersecting another block on the board
-                        if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
-                        {
-                            //rotate piece backwards
-                            getPiece().rotateCounterClockwise();
-                        }
-                        else
-                        {
-                            //keep track of the rotation
-                            setRotations(getRotations() + 1);
-                        }
-                        
-                        //rotation is complete, unflag rotation
-                        rotate = false;
-                    }
-                    
                     //update timer
                     getTimer().update(engine.getMain().getTime());
                 }
             }
+        }
+    }
+    
+    /**
+     * Rotate piece
+     */
+    protected void rotate()
+    {
+        //rotate piece
+        getPiece().rotateClockwise();
+
+        //if we are out of bounds or intersecting another block on the board
+        if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+        {
+            //rotate piece backwards
+            getPiece().rotateCounterClockwise();
+        }
+        else
+        {
+            //keep track of the rotation
+            setRotations(getRotations() + 1);
         }
     }
     
@@ -270,7 +248,7 @@ public abstract class Player implements Disposable, IElement
      * Set the rotation
      * @param rotations The number rotation we are on will range from 0 - 3
      */
-    protected void setRotations(final int rotations) throws Exception
+    protected void setRotations(final int rotations)
     {
         //assign number
         this.rotations = rotations;

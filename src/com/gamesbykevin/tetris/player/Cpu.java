@@ -23,18 +23,27 @@ public final class Cpu extends Player implements Disposable
     //the target number of rotations
     private int roationCount;
     
-    //the score for each line
-    private static final double BONUS_LINE = 500;
-    
     //the score for each block that is directly place above another
-    private static final double BONUS_BLOCK_COVER = 50;
+    public static final double BONUS_BLOCK_COVER = 3.97;
     
-    //the penalty for creating a hole
-    private static final double PENALTY_EMPTY_BLOCK = -100;
+    //the score for each block that is touchig the wall
+    public static final double BONUS_WALL_COVER = 6.52;
+    
+    //the score for each block that is touchig the floor
+    public static final double BONUS_FLOOR_COVER = 7;
+    
+    //the score for each line
+    public static final double BONUS_LINE = 10;
+    
+    //the penalty for placing a block directly above an empty space
+    public static final double PENALTY_BLOCKADE = -0.59;
+    
+    //the penalty for all empty spaces on the board that have a block directly above them
+    public static final double PENALTY_HOLES = -2.31;
     
     //the penalty for the block height
-    private static final double PENALTY_BLOCK_HEIGHT = -50;
-    
+    public static final double PENALTY_BLOCK_HEIGHT = -3.78;
+
     public Cpu()
     {
         super();
@@ -168,7 +177,7 @@ public final class Cpu extends Player implements Disposable
         for (int count = 0; count < Piece.TOTAL_ROTATIONS; count++)
         {
             //rotate piece
-            getPiece().rotateClockwise();
+            rotate();
             
             //check each column
             for (int col = 0; col < Board.COLS; col++)
@@ -199,38 +208,29 @@ public final class Cpu extends Player implements Disposable
                         //what is the score for placing the piece here
                         double tmpScore = 0;
                         
-                        /**
-                         * Scoring logic
-                         * 1. Add a bonus depending on number of lines completed
-                         * 2. Add a bonus for each block that has a block directly below it
-                         * 3. Add a penalty for each block that does not have a block directly below it 
-                         *    and multiply that penalty by the total number of empty blocks below
-                         * 4. Add a penalty for the height of each block
-                         * 5. ????????????????????
-                         */
-                        //get the number of completed lines here
-                        final int completedLines = getBoard().getCompletedRowCount();
-                        
-                        //add score for completed lines
-                        tmpScore += (completedLines * BONUS_LINE);
-                        
                         //count number of blocks directly below the piece
-                        final int coveredBlocks = getBoard().getBlockCount(true, getPiece());
-                        
-                        //add score for covered blocks
-                        tmpScore += (coveredBlocks * BONUS_BLOCK_COVER);
+                        final double coveredBlockScore = getBoard().getCoveredBlockScore(getPiece());
                         
                         //count number of empty spaces directly below the piece
-                        final int emptyBlocks = getBoard().getBlockCount(false, getPiece());
+                        final double blockadeScore = getBoard().getBlockadeScore(getPiece());
                         
-                        //add penalty for holes created
-                        tmpScore += (emptyBlocks * PENALTY_EMPTY_BLOCK);
+                        //the score for all the empty holes on the entire board
+                        final double emptyScore = getBoard().getHolesScore();
                         
-                        //get the total height of this piece
-                        final int totalHeight = getPiece().getTotalHeight();
+                        //add score for completed lines
+                        tmpScore += (getBoard().getCompletedRowCount() * BONUS_LINE);
+                        
+                        //add score for covered blocks
+                        tmpScore += coveredBlockScore;
+                        
+                        //add penalty for blockades created
+                        tmpScore += blockadeScore;
+                        
+                        //add penalty for the total number of holes on the board
+                        tmpScore += emptyScore;
                         
                         //add penalty for block height
-                        tmpScore += (totalHeight * PENALTY_BLOCK_HEIGHT);
+                        tmpScore += (getPiece().getTotalHeight() * PENALTY_BLOCK_HEIGHT);
                                 
                         //now that we are done scoring we can remove the piece from the board
                         getBoard().removePiece(getPiece());
@@ -245,7 +245,7 @@ public final class Cpu extends Player implements Disposable
                             score = tmpScore;
                             
                             //set our target rotation
-                            setTargetRotation(count);
+                            setTargetRotation(getRotations());
                             
                             //set the column we want to place the piece
                             setTargetColumn(col);
