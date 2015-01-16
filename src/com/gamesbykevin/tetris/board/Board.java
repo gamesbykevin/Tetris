@@ -5,9 +5,8 @@ import com.gamesbykevin.framework.resources.Disposable;
 
 import com.gamesbykevin.tetris.player.Cpu;
 import com.gamesbykevin.tetris.board.piece.*;
-import com.gamesbykevin.tetris.shared.Shared;
-import java.awt.Color;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 /**
@@ -97,7 +96,7 @@ public final class Board extends Sprite implements Disposable
                 if (hasBlock(col, row))
                 {
                     //if the block belongs to the piece, remove it
-                    if (board[row][col].getId() == piece.getId())
+                    if (getBlock(col, row).getId() == piece.getId())
                         setBlock(col, row, null);
                 }
             }
@@ -190,7 +189,7 @@ public final class Board extends Sprite implements Disposable
             if (hasBlock(col, row))
             {
                 //move the block to the row below
-                board[row + 1][col] = board[row][col];
+                board[row + 1][col] = getBlock(col, row);
                 
                 //remove the previous block
                 board[row][col] = null;
@@ -324,8 +323,8 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Get the penalty for blocks placed directly above an empty space
-     * @param piece The piece we placed
+     * Get the penalty for blocks placed directly above an empty space for the piece
+     * @param piece The piece we placed on the board
      * @return The total score penalty for empty blocks
      */
     public double getBlockadeScore(final Piece piece)
@@ -337,11 +336,11 @@ public final class Board extends Sprite implements Disposable
         {
             for (int col = 0; col < board[0].length; col++)
             {
-                //make sure location is within bounds
-                if (hasBounds(col, row))
+                //make sure location is within bounds and block exists
+                if (hasBounds(col, row) && hasBlock(col, row))
                 {
-                    //if the piece is part of this location and is also part of the board
-                    if (piece.hasBlock(col, row) && hasBlock(col, row))
+                    //make sure this block is part of the piece
+                    if (piece.hasBlock(col, row))
                     {
                         //if directly below is in bounds and there is not a block
                         if (hasBounds(col, row + 1) && !hasBlock(col, row + 1))
@@ -387,7 +386,7 @@ public final class Board extends Sprite implements Disposable
      * 1. Blocks that border each other (west, east, south directions)
      * 2. Blocks that border the side walls
      * 3. Blocks that border the floor
-     * @param piece The piece we placed on the board
+     * @param piece The piece we placed
      * @return The total score of the piece placed
      */
     public double getCoveredBlockScore(final Piece piece)
@@ -400,47 +399,51 @@ public final class Board extends Sprite implements Disposable
             for (int col = 0; col < board[0].length; col++)
             {
                 //make sure location is within bounds
-                if (hasBounds(col, row))
+                if (!hasBounds(col, row))
+                    continue;
+                
+                //if a block does not exist
+                if (!hasBlock(col, row))
+                    continue;
+                
+                //also make sure the location is part of the piece
+                if (!piece.hasBlock(col, row))
+                    continue;
+
+                //if we don't have bounds to the left we are touching a wall
+                if (!hasBounds(col - 1, row))
                 {
-                    //also make sure the location is part of the piece
-                    if (piece.hasBlock(col, row))
-                    {
-                        //if we don't have bounds to the left we are touching a wall
-                        if (!hasBounds(col - 1, row))
-                        {
-                            score += Cpu.BONUS_WALL_COVER;
-                        }
-                        else
-                        {
-                            //we are inbounds and have a bordering block, add touching block score
-                            if (hasBlock(col - 1, row))
-                                score += Cpu.BONUS_BLOCK_COVER;
-                        }
-                        
-                        //if we don't have bounds to the right we are touching a wall
-                        if (!hasBounds(col + 1, row))
-                        {
-                            score += Cpu.BONUS_WALL_COVER;
-                        }
-                        else
-                        {
-                            //we are inbounds and have a bordering block, add touching block score
-                            if (hasBlock(col + 1, row))
-                                score += Cpu.BONUS_BLOCK_COVER;
-                        }
-                        
-                        //if we don't have bounds below we are touching the floor
-                        if (!hasBounds(col, row + 1))
-                        {
-                            score += Cpu.BONUS_FLOOR_COVER;
-                        }
-                        else
-                        {
-                            //we are inbounds and have a bordering block, add touching block score
-                            if (hasBlock(col, row + 1))
-                                score += Cpu.BONUS_BLOCK_COVER;
-                        }
-                    }
+                    score += Cpu.BONUS_WALL_COVER;
+                }
+                else
+                {
+                    //we are inbounds and have a bordering block, add touching block score
+                    if (hasBlock(col - 1, row))
+                        score += Cpu.BONUS_BLOCK_COVER;
+                }
+
+                //if we don't have bounds to the right we are touching a wall
+                if (!hasBounds(col + 1, row))
+                {
+                    score += Cpu.BONUS_WALL_COVER;
+                }
+                else
+                {
+                    //we are inbounds and have a bordering block, add touching block score
+                    if (hasBlock(col + 1, row))
+                        score += Cpu.BONUS_BLOCK_COVER;
+                }
+
+                //if we don't have bounds below we are touching the floor
+                if (!hasBounds(col, row + 1))
+                {
+                    score += Cpu.BONUS_FLOOR_COVER;
+                }
+                else
+                {
+                    //we are inbounds and have a bordering block, add touching block score
+                    if (hasBlock(col, row + 1))
+                        score += Cpu.BONUS_BLOCK_COVER;
                 }
             }
         }
@@ -460,9 +463,14 @@ public final class Board extends Sprite implements Disposable
         this.board[row][col] = block;
     }
     
+    private Block getBlock(final int col, final int row)
+    {
+        return this.board[row][col];
+    }
+    
     /**
      * Does a block already occupy this space?
-     * @param piece The piece we want to check
+     * @param id The unique id of the piece we want to check
      * @return true if a block already exists where the piece is located, false otherwise
      */
     public boolean hasBlock(final Piece piece)
@@ -483,7 +491,7 @@ public final class Board extends Sprite implements Disposable
         
     private boolean hasBlock(final int col, final int row)
     {
-        return (this.board[row][col] != null);
+        return (getBlock(col, row) != null);
     }
     
     @Override
@@ -495,7 +503,7 @@ public final class Board extends Sprite implements Disposable
         {
             for (int col = 0; col < board[0].length; col++)
             {
-                Block block = board[row][col];
+                Block block = getBlock(col, row);
                 
                 if (block != null)
                 {
@@ -530,7 +538,7 @@ public final class Board extends Sprite implements Disposable
                     int drawY = startY + (row * Block.HEIGHT);
                     
                     //set color
-                    graphics.setColor(board[row][col].getColor());
+                    graphics.setColor(getBlock(col, row).getColor());
 
                     //fill block
                     graphics.fillRect(drawX, drawY, Block.WIDTH, Block.HEIGHT);

@@ -35,13 +35,10 @@ public abstract class Player implements Disposable, IElement
     private Timer complete;
     
     //default time between piece drops
-    private static final long DEFAULT_PIECE_DROP_DELAY = Timers.toNanoSeconds(1000L);
+    private static final long DEFAULT_PIECE_DROP_DELAY = Timers.toNanoSeconds(200L);
 
     //default time to show a completed line(s)
     private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
-    
-    //keep track of the number of rotations
-    private int rotations = 0;
     
     protected Player()
     {
@@ -66,8 +63,6 @@ public abstract class Player implements Disposable, IElement
         
         piece = null;
         next = null;
-        
-        setRotations(0);
     }
     
     public Board getBoard()
@@ -221,41 +216,16 @@ public abstract class Player implements Disposable, IElement
     {
         //rotate piece
         getPiece().rotateClockwise();
-
-        //if we are out of bounds or intersecting another block on the board
-        if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                
+        if (getPiece().getRow() != 0)
         {
-            //rotate piece backwards
-            getPiece().rotateCounterClockwise();
+            //if we are out of bounds or intersecting another block on the board
+            if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+            {
+                //rotate piece backwards
+                getPiece().rotateCounterClockwise();
+            }
         }
-        else
-        {
-            //keep track of the rotation
-            setRotations(getRotations() + 1);
-        }
-    }
-    
-    /**
-     * Get the number of rotations
-     * @return The number of rotations ranging from 0 - 3
-     */
-    protected int getRotations()
-    {
-        return this.rotations;
-    }
-    
-    /**
-     * Set the rotation
-     * @param rotations The number rotation we are on will range from 0 - 3
-     */
-    protected void setRotations(final int rotations)
-    {
-        //assign number
-        this.rotations = rotations;
-        
-        //if out of range reset to 0
-        if (rotations < 0 || rotations >= Piece.TOTAL_ROTATIONS)
-            this.rotations = 0;
     }
     
     /**

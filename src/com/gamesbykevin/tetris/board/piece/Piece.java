@@ -48,6 +48,9 @@ public final class Piece extends Sprite implements Disposable
     //array of all possible pieces
     public static final int[] PIECES = {PIECE_ONE, PIECE_TWO, PIECE_THREE, PIECE_FOUR, PIECE_FIVE, PIECE_SIX, PIECE_SEVEN};
     
+    //keep track of the number of rotations
+    private int rotations = 0;
+    
     public Piece(final int col, final int row, final int type) throws Exception
     {
         //call to parent constructor
@@ -66,40 +69,40 @@ public final class Piece extends Sprite implements Disposable
              * Straight line
              */
             case PIECE_ONE:
-                add(-2, 0, PIECE_ONE_COLOR);
-                add(-1, 0, PIECE_ONE_COLOR);
                 add(0, 0, PIECE_ONE_COLOR);
                 add(1, 0, PIECE_ONE_COLOR);
-                break;
-                
-            /**
-             * J
-             */
-            case PIECE_TWO:
-                add(0, 0, PIECE_TWO_COLOR);
-                add(0, 1, PIECE_TWO_COLOR);
-                add(1, 1, PIECE_TWO_COLOR);
-                add(2, 1, PIECE_TWO_COLOR);
+                add(2, 0, PIECE_ONE_COLOR);
+                add(3, 0, PIECE_ONE_COLOR);
                 break;
                 
             /**
              * L
              */
+            case PIECE_TWO:
+                add(0, 0, PIECE_TWO_COLOR);
+                add(0, 1, PIECE_TWO_COLOR);
+                add(0, 2, PIECE_TWO_COLOR);
+                add(1, 2, PIECE_TWO_COLOR);
+                break;
+                
+            /**
+             * J
+             */
             case PIECE_THREE:
                 add(0,  0, PIECE_THREE_COLOR);
                 add(0,  1, PIECE_THREE_COLOR);
-                add(-1, 1, PIECE_THREE_COLOR);
-                add(-2, 1, PIECE_THREE_COLOR);
+                add(0,  2, PIECE_THREE_COLOR);
+                add(-1, 2, PIECE_THREE_COLOR);
                 break;
                 
             /**
              * Square
              */
             case PIECE_FOUR:
-                add(-1,  0, PIECE_FOUR_COLOR);
                 add(0,  0, PIECE_FOUR_COLOR);
+                add(1,  0, PIECE_FOUR_COLOR);
+                add(1,  1, PIECE_FOUR_COLOR);
                 add(0,  1, PIECE_FOUR_COLOR);
-                add(-1,  1, PIECE_FOUR_COLOR);
                 break;
                 
             /**
@@ -216,6 +219,32 @@ public final class Piece extends Sprite implements Disposable
             block.setCol(row);
             block.setRow(-col);
         }
+        
+        //keep track of rotation
+        setRotations(getRotation() + 1);
+    }
+    
+    /**
+     * Set the rotation
+     * @param rotations The number rotation we are on will range from 0 - 3
+     */
+    public void setRotations(final int rotations)
+    {
+        //assign number
+        this.rotations = rotations;
+        
+        //if out of range reset to 0
+        if (rotations < 0 || rotations >= TOTAL_ROTATIONS)
+            this.rotations = 0;
+    }
+    
+    /**
+     * Get the number of rotations
+     * @return The number of rotations ranging from 0 - 3
+     */
+    public int getRotation()
+    {
+        return this.rotations;
     }
     
     /**
@@ -235,6 +264,9 @@ public final class Piece extends Sprite implements Disposable
             block.setCol(-row);
             block.setRow(col);
         }
+        
+        //keep track of rotation
+        setRotations(getRotation() - 1);
     }
     
     @Override
