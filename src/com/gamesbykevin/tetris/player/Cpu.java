@@ -23,26 +23,17 @@ public final class Cpu extends Player implements Disposable
     //the target number of rotations
     private int roationCount;
     
-    //the score for each block that is touching the blocks of the piece we are placing
-    public static final double BONUS_BLOCK_COVER = 3.5;
+    //aggregate height score weight
+    private static final double WEIGHT_AGGREGATE_HEIGHT = -0.66569;
     
-    //the score for each block that is touchig the wall
-    public static final double BONUS_WALL_COVER = 2.25;
+    //completed lines score weight
+    private static final double WEIGHT_COMPLETED_LINES = 0.99275;
     
-    //the score for each block that is touchig the floor
-    public static final double BONUS_FLOOR_COVER = 5;
+    //holes score weight
+    private static final double WEIGHT_HOLES = -0.46544;
     
-    //the score for each line
-    public static final double BONUS_LINE = 25;
-    
-    //the penalty for placing a block directly above an empty space
-    public static final double PENALTY_BLOCKADE = -10;
-    
-    //the penalty for the holes remaining in the rows where the piece is placed
-    public static final double PENALTY_HOLES = -3;
-    
-    //the penalty for the block height
-    public static final double PENALTY_BLOCK_HEIGHT = -5;
+    //bumpiness score weight
+    private static final double WEIGHT_BUMPINESS = -0.24077;
     
     public Cpu()
     {
@@ -205,30 +196,18 @@ public final class Cpu extends Player implements Disposable
                         //what is the score for placing the piece here
                         double tmpScore = 0;
                         
-                        //count number of blocks directly below the piece
-                        final double coveredBlockScore = getBoard().getCoveredBlockScore(getPiece());
+                        //calculate/add aggregate height score
+                        tmpScore += (WEIGHT_AGGREGATE_HEIGHT * getBoard().getAggregateHeight());
                         
-                        //count number of empty spaces directly below the piece
-                        final double blockadeScore = getBoard().getBlockadeScore(getPiece());
+                        //calculate/add completed row(s) score
+                        tmpScore += (WEIGHT_COMPLETED_LINES * getBoard().getCompletedRowCount());
                         
-                        //the score for all the empty holes on the entire board
-                        final double emptyScore = getBoard().getHolesScore();
+                        //calculate/add hole count score
+                        tmpScore += (WEIGHT_HOLES * getBoard().getHoleCount());
                         
-                        //add score for completed lines
-                        tmpScore += (getBoard().getCompletedRowCount() * BONUS_LINE);
-                        
-                        //add score for covered blocks
-                        tmpScore += coveredBlockScore;
-                        
-                        //add penalty for blockades created
-                        tmpScore += blockadeScore;
-                        
-                        //add penalty for the total number of holes on the board
-                        tmpScore += emptyScore;
-                        
-                        //add penalty for block height
-                        tmpScore += (getPiece().getTotalHeight() * PENALTY_BLOCK_HEIGHT);
-                        
+                        //calculate/add bumpiness score
+                        tmpScore += (WEIGHT_BUMPINESS * getBoard().getBumpiness());
+
                         //if this score is better than our high score, or we need to set the score to beat
                         if (tmpScore > score || initialScore)
                         {

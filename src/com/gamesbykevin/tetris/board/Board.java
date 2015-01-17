@@ -112,10 +112,7 @@ public final class Board extends Sprite implements Disposable
     {
         //if a block exists the piece can't be added
         if (hasBlock(piece))
-        {
-            System.out.println("Lines = " + this.getLines());
-            throw new Exception("A block already exists here and the piece can't be placed.");
-        }
+            throw new Exception("A block already exists here and the piece can't be placed");
         
         //add each block to the board
         for (int i = 0; i < piece.getBlocks().size(); i++)
@@ -127,8 +124,12 @@ public final class Board extends Sprite implements Disposable
             int col = (int)(block.getCol() + piece.getCol());
             int row = (int)(block.getRow() + piece.getRow());
             
-            //add block at location
-            setBlock(col, row, block);
+            //make sure we aren't placing this specific block out of bounds
+            if (hasBounds(col, row))
+            {
+                //add block at location
+                setBlock(col, row, block);
+            }
         }
     }
     
@@ -324,159 +325,6 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Get the penalty for blocks placed directly above an empty space for the piece
-     * @param piece The piece we placed on the board
-     * @return The total score penalty for empty blocks
-     */
-    public double getBlockadeScore(final Piece piece)
-    {
-        //the count
-        int count = 0;
-        
-        for (int col = 0; col < board[0].length; col++)
-        {
-            for (int row = 0; row < board.length; row++)
-            {
-                //make sure location is within bounds and block exists
-                if (hasBounds(col, row) && hasBlock(col, row))
-                {
-                    //make sure this block is part of the piece
-                    if (piece.hasBlock(col, row))
-                    {
-                        //count how many holes are below
-                        for (int tmpRow = row; tmpRow < board.length; tmpRow++)
-                        {
-                            //if the position is not in bounds skip
-                            if (!hasBounds(col, tmpRow))
-                                continue;
-                            
-                            //if there is no block here, it is a hole
-                            if (!hasBlock(col, tmpRow))
-                                count++;
-                        }
-                    }
-                }
-            }
-        }
-        
-        //return the total score
-        return (count * Cpu.PENALTY_BLOCKADE);
-    }
-    
-    /**
-     * Get the penalty for all the holes in the board
-     * @param piece The piece we placed
-     * @return The total score for the holes.
-     */
-    public double getHolesScore()
-    {
-        double score = 0;
-        
-        for (int row = 0; row < board.length; row++)
-        {
-            //the number of holes in this row
-            int count = 0;
-            
-            //is there at least 1 block in this row
-            boolean hasBlock = false;
-            
-            for (int col = 0; col < board[0].length; col++)
-            {
-                //if not part of bounds continue
-                if (!hasBounds(col, row))
-                    continue;
-                
-                //if there is a block in this row, flag
-                if (hasBlock(col, row))
-                    hasBlock = true;
-                
-                //if there is no block count the hole
-                if (!hasBlock(col, row))
-                    count++;
-            }
-            
-            //if there was at least 1 block penalize the holes
-            if (hasBlock)
-                score += (count * Cpu.PENALTY_HOLES);
-        }
-        
-        //return the total score
-        return score;
-    }
-    
-    /**
-     * Get the total score for the piece placed.<br>
-     * Will check the following:<br>
-     * 1. Blocks that border each other (west, east, south directions)
-     * 2. Blocks that border the side walls
-     * 3. Blocks that border the floor
-     * @param piece The piece we placed
-     * @return The total score of the piece placed
-     */
-    public double getCoveredBlockScore(final Piece piece)
-    {
-        //our return score
-        double score = 0;
-        
-        for (int col = 0; col < board[0].length; col++)
-        {
-            for (int row = 0; row < board.length; row++)
-            {
-                //make sure location is within bounds
-                if (!hasBounds(col, row))
-                    continue;
-                
-                //if a block does not exist
-                if (!hasBlock(col, row))
-                    continue;
-                
-                //also make sure the location is part of the piece
-                if (!piece.hasBlock(col, row))
-                    continue;
-
-                //if we don't have bounds to the left we are touching a wall
-                if (!hasBounds(col - 1, row))
-                {
-                    score += Cpu.BONUS_WALL_COVER;
-                }
-                else
-                {
-                    //we are inbounds and have a bordering block, add touching block score
-                    if (hasBlock(col - 1, row))
-                        score += Cpu.BONUS_BLOCK_COVER;
-                }
-
-                //if we don't have bounds to the right we are touching a wall
-                if (!hasBounds(col + 1, row))
-                {
-                    score += Cpu.BONUS_WALL_COVER;
-                }
-                else
-                {
-                    //we are inbounds and have a bordering block, add touching block score
-                    if (hasBlock(col + 1, row))
-                        score += Cpu.BONUS_BLOCK_COVER;
-                }
-
-                //if we don't have bounds below we are touching the floor
-                if (!hasBounds(col, row + 1))
-                {
-                    score += Cpu.BONUS_FLOOR_COVER;
-                }
-                else
-                {
-                    //we are inbounds and have a bordering block, add touching block score
-                    if (hasBlock(col, row + 1))
-                        score += Cpu.BONUS_BLOCK_COVER;
-                }
-            }
-        }
-        
-        //return total score
-        return score;
-    }
-    
-    /**
      * Assign the block to the board
      * @param col Column
      * @param row Row
@@ -490,6 +338,106 @@ public final class Board extends Sprite implements Disposable
     private Block getBlock(final int col, final int row)
     {
         return this.board[row][col];
+    }
+    
+    /**
+     * Get the column height
+     * @param col column
+     * @return The height of the highest block in the given column, if no blocks exist 0 will be returned
+     */
+    private int getColumnHeight(final int col)
+    {
+        for (int row = 0; row < board.length; row++)
+        {
+            //if there is a block add the height
+            if (hasBlock(col, row))
+            {
+                //return height
+                return (Board.ROWS - row);
+            }
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * Get the height of the highest block in each column
+     * @return The total height of the highest block in all columns
+     */
+    public int getAggregateHeight()
+    {
+        int height = 0;
+        
+        for (int col = 0; col < board[0].length; col++)
+        {
+            //add height to total
+            height += getColumnHeight(col);
+        }
+        
+        //return the total height
+        return height;
+    }
+    
+    /**
+     * Count the number of holes on the board
+     * @return the total number of holes with at least a block above it
+     */
+    public int getHoleCount()
+    {
+        int count = 0;
+        
+        for (int col = 0; col < board[0].length; col++)
+        {
+            //did we hit a block yet
+            boolean hitBlock = false;
+            
+            for (int row = 0; row < board.length; row++)
+            {
+                //if we found a block, flag it
+                if (hasBlock(col, row))
+                {
+                    hitBlock = true;
+                }
+                else
+                {
+                    //if this is not a block and we already found one, then this is a hole
+                    if (hitBlock)
+                        count++;
+                }
+            }
+        }
+        
+        //return the total number of holes
+        return count;
+    }
+    
+    /**
+     * Calculate the bumpiness of the board, the differences in height on the board
+     * @return The sum of the absolute differences between all two side-by-side columns
+     */
+    public int getBumpiness()
+    {
+        int bumpiness = 0;
+        
+        for (int col = 0; col < board[0].length - 1; col++)
+        {
+            //get the height of the 2 neighboring columns
+            final int height1 = getColumnHeight(col);
+            final int height2 = getColumnHeight(col + 1);
+            
+            //calculate bumpiness and add to total
+            if (height1 > height2)
+            {
+                bumpiness += (height1 - height2);
+            }
+            else
+            {
+                bumpiness += (height2 - height1);
+            }
+        }
+        
+        //return bumpiness
+        return bumpiness;
     }
     
     /**

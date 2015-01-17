@@ -163,26 +163,6 @@ public final class Piece extends Sprite implements Disposable
     }
     
     /**
-     * Get the total height of this piece.<br>
-     * The very bottom of the board will have a height of 1 and the row above will have a height of 2, etc...
-     * @return The sum of all the rows for each block in the piece
-     */
-    public int getTotalHeight()
-    {
-        //the total height
-        int total = 0;
-        
-        for (int i = 0; i < getBlocks().size(); i++)
-        {
-            //add the height of this block to the total
-            total += (Board.ROWS - ((getRow() + getBlocks().get(i).getRow()) + 1));
-        }
-        
-        //return the total height
-        return total;
-    }
-    
-    /**
      * Is any block in this piece above the ceiling
      * @return true if at least 1 block has a row less than 0, false otherwise
      */

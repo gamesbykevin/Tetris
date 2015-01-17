@@ -40,6 +40,9 @@ public abstract class Player implements Disposable, IElement
     //default time to show a completed line(s)
     private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(0);
     
+    //is the game finished for the player (meaning the board crashed)
+    private boolean gameover = false;
+    
     protected Player()
     {
         //create a new board
@@ -65,6 +68,10 @@ public abstract class Player implements Disposable, IElement
         next = null;
     }
     
+    /**
+     * Get the board
+     * @return The board where the player places tetris blocks
+     */
     public Board getBoard()
     {
         return this.board;
@@ -162,6 +169,10 @@ public abstract class Player implements Disposable, IElement
                         //move piece back to previous
                         getPiece().decreaseRow();
 
+                        //if the piece is still not within bouns the player lost
+                        if (!getBoard().hasBounds(getPiece()))
+                            setGameover(true);
+                        
                         //add piece to board
                         getBoard().addPiece(getPiece());
 
@@ -188,9 +199,6 @@ public abstract class Player implements Disposable, IElement
                         //add the completed rows towards the total lines completed count
                         getBoard().setLines(getBoard().getLines() + getBoard().getCompletedRowCount());
                         
-                        if (Shared.DEBUG)
-                            System.out.println("Lines completed - " + getBoard().getLines());
-                        
                         //remove completed lines
                         getBoard().clearCompletedRows();
 
@@ -214,6 +222,24 @@ public abstract class Player implements Disposable, IElement
     }
     
     /**
+     * Is the game over for this player?
+     * @return true if the board is filled with blocks, false otherwise
+     */
+    protected boolean hasGameover()
+    {
+        return this.gameover;
+    }
+    
+    /**
+     * Flag the game finished (or not)
+     * @param gameover Has the board has been filled with blocks?
+     */
+    protected void setGameover(final boolean gameover)
+    {
+        this.gameover = gameover;
+    }
+    
+    /**
      * Rotate piece
      */
     protected void rotate()
@@ -221,7 +247,7 @@ public abstract class Player implements Disposable, IElement
         //rotate piece
         getPiece().rotateClockwise();
                 
-        if (getPiece().getRow() != 0)
+        if (!getPiece().isAboveCeiling())
         {
             //if we are out of bounds or intersecting another block on the board
             if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
