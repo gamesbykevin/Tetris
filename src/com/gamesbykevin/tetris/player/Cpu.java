@@ -1,7 +1,6 @@
 package com.gamesbykevin.tetris.player;
 
 import com.gamesbykevin.framework.resources.Disposable;
-import com.gamesbykevin.framework.util.Timers;
 import com.gamesbykevin.tetris.board.Board;
 import com.gamesbykevin.tetris.board.piece.Piece;
 
@@ -24,27 +23,27 @@ public final class Cpu extends Player implements Disposable
     //the target number of rotations
     private int roationCount;
     
-    //the score for each block that is directly place above another
-    public static final double BONUS_BLOCK_COVER = 5.97;
+    //the score for each block that is touching the blocks of the piece we are placing
+    public static final double BONUS_BLOCK_COVER = 3.5;
     
     //the score for each block that is touchig the wall
-    public static final double BONUS_WALL_COVER = 1.65;
+    public static final double BONUS_WALL_COVER = 2.25;
     
     //the score for each block that is touchig the floor
-    public static final double BONUS_FLOOR_COVER = 6.52;
+    public static final double BONUS_FLOOR_COVER = 5;
     
     //the score for each line
-    public static final double BONUS_LINE = 15.6;
+    public static final double BONUS_LINE = 25;
     
     //the penalty for placing a block directly above an empty space
-    public static final double PENALTY_BLOCKADE = -4.59;
+    public static final double PENALTY_BLOCKADE = -10;
     
-    //the penalty for all empty spaces on the board that have a block directly above them
-    public static final double PENALTY_HOLES = -3.31;
+    //the penalty for the holes remaining in the rows where the piece is placed
+    public static final double PENALTY_HOLES = -3;
     
     //the penalty for the block height
-    public static final double PENALTY_BLOCK_HEIGHT = -2.78;
-
+    public static final double PENALTY_BLOCK_HEIGHT = -5;
+    
     public Cpu()
     {
         super();
@@ -178,34 +177,27 @@ public final class Cpu extends Player implements Disposable
         for (int count = 0; count < Piece.TOTAL_ROTATIONS; count++)
         {
             //rotate piece clockwise each time
-            super.getPiece().rotateClockwise();
+            getPiece().rotateClockwise();
             
-            //check each column
+            //check each location
             for (int col = 0; col < Board.COLS; col++)
             {
-                //set the starting point
-                getPiece().setCol(col);
-                getPiece().setRow(0);
-                
-                //if we are out of bounds or a block already exists in this place check next location
-                if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
-                    continue;
-                
-                //now check until we find the floor
-                for (int row = 0; row <= Board.ROWS; row++)
+                for (int row = 0; row < Board.ROWS; row++)
                 {
-                    //set the new row to check
+                    //set the starting point
+                    getPiece().setCol(col);
                     getPiece().setRow(row);
                     
+                    //if the piece is not in bounds here, continue
+                    if (!getBoard().hasBounds(getPiece()))
+                        continue;
+                    
                     //check until we hit floor or another block
-                    if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                    if (getPiece().hasFloor() || getBoard().hasBlock(getPiece()))
                     {
-                        //now move the piece back up 1 row and lets score the position
-                        getPiece().decreaseRow();
-                        
-                        //if piece is no longer part of board
-                        if (!getBoard().hasBounds(getPiece()))
-                            break;
+                        //if we hit a block move up 1 row
+                        if (getBoard().hasBlock(getPiece()))
+                            getPiece().decreaseRow();
                         
                         //add piece to board
                         getBoard().addPiece(getPiece());
@@ -251,17 +243,6 @@ public final class Cpu extends Player implements Disposable
                             
                             //set the column we want to place the piece
                             setTargetColumn(col);
-                            
-                            System.out.println("");
-                            System.out.println("col = " + col);
-                            System.out.println("Score = " + tmpScore);
-                            
-                            for (int i=0; i < getPiece().getBlocks().size(); i++)
-                            {
-                                com.gamesbykevin.tetris.board.piece.Block block = getPiece().getBlocks().get(i);
-                                System.out.println("(" + block.getCol() + "," + block.getRow() + ")");
-                            }
-                            System.out.println("");
                         }
                         
                         //now that we are done scoring we can remove the piece from the board

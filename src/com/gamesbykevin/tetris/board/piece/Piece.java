@@ -175,11 +175,43 @@ public final class Piece extends Sprite implements Disposable
         for (int i = 0; i < getBlocks().size(); i++)
         {
             //add the height of this block to the total
-            total += (Board.ROWS - (getRow() + getBlocks().get(i).getRow()));
+            total += (Board.ROWS - ((getRow() + getBlocks().get(i).getRow()) + 1));
         }
         
         //return the total height
         return total;
+    }
+    
+    /**
+     * Is any block in this piece above the ceiling
+     * @return true if at least 1 block has a row less than 0, false otherwise
+     */
+    public boolean isAboveCeiling()
+    {
+        for (int i = 0; i < getBlocks().size(); i++)
+        {
+            if (getRow() + getBlocks().get(i).getRow() < 0)
+                return true;
+        }
+        
+        //none were on the floor
+        return false;
+    }
+    
+    /**
+     * Check if any of the blocks are located on the floor of the board
+     * @return true if at least 1 block is on the same row as the floor of the board, false otherwise
+     */
+    public boolean hasFloor()
+    {
+        for (int i = 0; i < getBlocks().size(); i++)
+        {
+            if (getRow() + getBlocks().get(i).getRow() == Board.ROWS - 1)
+                return true;
+        }
+        
+        //none were on the floor
+        return false;
     }
     
     /**
@@ -200,28 +232,6 @@ public final class Piece extends Sprite implements Disposable
     public List<Block> getBlocks()
     {
         return this.blocks;
-    }
-    
-    /**
-     * Rotate the piece 90 degrees clockwise
-     */
-    public void rotateClockwise()
-    {
-        for (int i = 0; i < blocks.size(); i++)
-        {
-            Block block = blocks.get(i);
-            
-            //get current location
-            final double col = block.getCol();
-            final double row = block.getRow();
-         
-            //rotate coordinate
-            block.setCol(row);
-            block.setRow(-col);
-        }
-        
-        //keep track of rotation
-        setRotations(getRotation() + 1);
     }
     
     /**
@@ -267,6 +277,28 @@ public final class Piece extends Sprite implements Disposable
         
         //keep track of rotation
         setRotations(getRotation() - 1);
+    }
+    
+    /**
+     * Rotate the piece 90 degrees clockwise
+     */
+    public void rotateClockwise()
+    {
+        for (int i = 0; i < blocks.size(); i++)
+        {
+            Block block = blocks.get(i);
+            
+            //get current location
+            final double col = block.getCol();
+            final double row = block.getRow();
+         
+            //rotate coordinate
+            block.setCol(row);
+            block.setRow(-col);
+        }
+        
+        //keep track of rotation
+        setRotations(getRotation() + 1);
     }
     
     @Override

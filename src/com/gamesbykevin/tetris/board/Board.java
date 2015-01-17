@@ -87,11 +87,11 @@ public final class Board extends Sprite implements Disposable
      * Remove all the blocks from the board that have the same id as the piece.<br>
      * @param piece The piece we want to match
      */
-    public void removePiece(final Piece piece)
+    public void removePiece(final Piece piece) throws Exception
     {
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 if (hasBlock(col, row))
                 {
@@ -236,7 +236,7 @@ public final class Board extends Sprite implements Disposable
      * Remove all blocks that are part of a completed row(s).<br>
      * Will also add the number of completed rows to the total
      */
-    public void clearCompletedRows()
+    public void clearCompletedRows() throws Exception
     {
         for (int row = 0; row < board.length; row++)
         {
@@ -252,6 +252,7 @@ public final class Board extends Sprite implements Disposable
     /**
      * Remove all blocks for a given row
      * @param row The row we want to remove all blocks from
+     * @throws exception
      */
     private void clearRow(final int row)
     {
@@ -332,9 +333,9 @@ public final class Board extends Sprite implements Disposable
         //the count
         int count = 0;
         
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 //make sure location is within bounds and block exists
                 if (hasBounds(col, row) && hasBlock(col, row))
@@ -342,9 +343,17 @@ public final class Board extends Sprite implements Disposable
                     //make sure this block is part of the piece
                     if (piece.hasBlock(col, row))
                     {
-                        //if directly below is in bounds and there is not a block
-                        if (hasBounds(col, row + 1) && !hasBlock(col, row + 1))
-                            count++;
+                        //count how many holes are below
+                        for (int tmpRow = row; tmpRow < board.length; tmpRow++)
+                        {
+                            //if the position is not in bounds skip
+                            if (!hasBounds(col, tmpRow))
+                                continue;
+                            
+                            //if there is no block here, it is a hole
+                            if (!hasBlock(col, tmpRow))
+                                count++;
+                        }
                     }
                 }
             }
@@ -355,8 +364,9 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Get the penalty for all the holes on the <b>entire</b> board
-     * @return The total score for each block that has an empty space below it.
+     * Get the penalty for all the holes in the board
+     * @param piece The piece we placed
+     * @return The total score for the holes.
      */
     public double getHolesScore()
     {
@@ -364,16 +374,30 @@ public final class Board extends Sprite implements Disposable
         
         for (int row = 0; row < board.length; row++)
         {
+            //the number of holes in this row
+            int count = 0;
+            
+            //is there at least 1 block in this row
+            boolean hasBlock = false;
+            
             for (int col = 0; col < board[0].length; col++)
             {
-                //make sure current location and below are in bounds
-                if (hasBounds(col, row) && hasBounds(col, row + 1))
-                {
-                    //if we have a block here, but not below it is a hole
-                    if (hasBlock(col, row) && !hasBlock(col, row + 1))
-                        score += Cpu.PENALTY_HOLES;
-                }
+                //if not part of bounds continue
+                if (!hasBounds(col, row))
+                    continue;
+                
+                //if there is a block in this row, flag
+                if (hasBlock(col, row))
+                    hasBlock = true;
+                
+                //if there is no block count the hole
+                if (!hasBlock(col, row))
+                    count++;
             }
+            
+            //if there was at least 1 block penalize the holes
+            if (hasBlock)
+                score += (count * Cpu.PENALTY_HOLES);
         }
         
         //return the total score
@@ -394,9 +418,9 @@ public final class Board extends Sprite implements Disposable
         //our return score
         double score = 0;
         
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 //make sure location is within bounds
                 if (!hasBounds(col, row))
@@ -470,14 +494,14 @@ public final class Board extends Sprite implements Disposable
     
     /**
      * Does a block already occupy this space?
-     * @param id The unique id of the piece we want to check
+     * @param piece The piece we want to check
      * @return true if a block already exists where the piece is located, false otherwise
      */
     public boolean hasBlock(final Piece piece)
     {
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 //if a block exists here, and the block is part of the piece
                 if (hasBlock(col, row) && piece.hasBlock(col, row))
@@ -499,9 +523,9 @@ public final class Board extends Sprite implements Disposable
     {
         super.dispose();
         
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 Block block = getBlock(col, row);
                 
@@ -526,9 +550,9 @@ public final class Board extends Sprite implements Disposable
         int startY = (int)getY();
         
         //draw blocks
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 //only draw block if we have one
                 if (hasBlock(col, row))
@@ -547,9 +571,9 @@ public final class Board extends Sprite implements Disposable
         }
         
         //draw block outline
-        for (int row = 0; row < board.length; row++)
+        for (int col = 0; col < board[0].length; col++)
         {
-            for (int col = 0; col < board[0].length; col++)
+            for (int row = 0; row < board.length; row++)
             {
                 //only draw outline if we have a block
                 //if (hasBlock(col, row))

@@ -38,7 +38,7 @@ public abstract class Player implements Disposable, IElement
     private static final long DEFAULT_PIECE_DROP_DELAY = Timers.toNanoSeconds(200L);
 
     //default time to show a completed line(s)
-    private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
+    private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(0);
     
     protected Player()
     {
@@ -153,20 +153,24 @@ public abstract class Player implements Disposable, IElement
                 //move piece south
                 getPiece().increaseRow();
 
-                //if we are out of bounds or intersecting another block on the board
-                if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                //make sure the piece is not at the very top of the board
+                if (!getPiece().isAboveCeiling())
                 {
-                    //move piece back to previous
-                    getPiece().decreaseRow();
+                    //if we are out of bounds or intersecting another block on the board
+                    if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                    {
+                        //move piece back to previous
+                        getPiece().decreaseRow();
 
-                    //add piece to board
-                    getBoard().addPiece(getPiece());
+                        //add piece to board
+                        getBoard().addPiece(getPiece());
 
-                    //check for a complete line
-                    getBoard().markCompletedRow();
+                        //check for a complete line
+                        getBoard().markCompletedRow();
 
-                    //now remove the piece
-                    removePiece();
+                        //now remove the piece
+                        removePiece();
+                    }
                 }
             }
             else
