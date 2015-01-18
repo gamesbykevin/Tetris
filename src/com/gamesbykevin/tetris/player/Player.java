@@ -9,7 +9,6 @@ import com.gamesbykevin.tetris.board.piece.Block;
 import com.gamesbykevin.tetris.board.piece.Piece;
 import com.gamesbykevin.tetris.engine.Engine;
 import com.gamesbykevin.tetris.shared.IElement;
-import com.gamesbykevin.tetris.shared.Shared;
 
 import java.awt.Graphics;
 
@@ -43,6 +42,9 @@ public abstract class Player implements Disposable, IElement
     //is the game finished for the player (meaning the board crashed)
     private boolean gameover = false;
     
+    //do we render isometric
+    private boolean isometric = false;
+    
     protected Player()
     {
         //create a new board
@@ -66,6 +68,27 @@ public abstract class Player implements Disposable, IElement
         
         piece = null;
         next = null;
+        
+        //game is not over
+        setGameover(false);
+    }
+    
+    /**
+     * Set the render to isometric
+     * @param isometric true - isometric, false - 2d
+     */
+    protected void setIsometric(final boolean isometric)
+    {
+        this.isometric = isometric;
+    }
+    
+    /**
+     * Do we render the board isometric
+     * @return true - isometric, false - 2d
+     */
+    protected boolean hasIsometric()
+    {
+        return this.isometric;
     }
     
     /**
@@ -112,7 +135,7 @@ public abstract class Player implements Disposable, IElement
      */
     protected void createNextPiece(final int type) throws Exception
     {
-        this.next = new Piece(Board.START_COL + Board.COLS, Board.START_ROW, type);
+        this.next = new Piece(Board.COLS + 2, Board.START_ROW, type);
     }
     
     /**
@@ -169,13 +192,32 @@ public abstract class Player implements Disposable, IElement
                         //move piece back to previous
                         getPiece().decreaseRow();
 
-                        //if the piece is still not within bouns the player lost
+                        //if the piece is still not within bounds the player lost
                         if (!getBoard().hasBounds(getPiece()))
                             setGameover(true);
                         
-                        //add piece to board
-                        getBoard().addPiece(getPiece());
-
+                        //make sure we aren't placing piece over another
+                        if (!getBoard().hasBlock(getPiece()))
+                        {
+                            //add piece to board
+                            getBoard().addPiece(getPiece());
+                        }
+                        else
+                        {
+                            //we are placing a piece over another, it is gameover
+                            setGameover(true);
+                        }
+                        
+                        //check around the start area at top to see if there is gameover
+                        for (int col = 0; col <= Board.START_RANGE; col++)
+                        {
+                            //if there is a block here, it is gameover
+                            if (getBoard().hasBlock(Board.START_COL - col, Board.START_ROW))
+                                setGameover(true);
+                            if (getBoard().hasBlock(Board.START_COL + col, Board.START_ROW))
+                                setGameover(true);
+                        }
+                        
                         //check for a complete line
                         getBoard().markCompletedRow();
 
@@ -298,32 +340,68 @@ public abstract class Player implements Disposable, IElement
     {
         if (getBoard() != null)
         {
-            //draw board
-            getBoard().render(graphics);
-        }
-        
-        //only draw the current piece if no lines have been completed
-        if (!getBoard().hasComplete())
-        {
-            if (getPiece() != null)
+            //only draw the current piece if no lines have been completed
+            if (!getBoard().hasComplete())
             {
-                //calculate the coordinates where the render should start
-                int x = (int)(getBoard().getX() + (getPiece().getCol() * Block.WIDTH));
-                int y = (int)(getBoard().getY() + (getPiece().getRow() * Block.HEIGHT));
+                if (getPiece() != null)
+                {
+                    try
+                    {
+                        if (!getBoard().hasBlock(getPiece()))
+                        {
+                            //add piece to board
+                            getBoard().addPiece(getPiece());
 
-                //render the piece
-                getPiece().render(x, y, graphics);
+                            //draw board
+                            getBoard().render(graphics, hasIsometric());
+
+                            //now remove the piece
+                            getBoard().removePiece(getPiece());
+                        }
+                        else
+                        {
+                            //draw board
+                            getBoard().render(graphics, hasIsometric());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    //draw board
+                    getBoard().render(graphics, hasIsometric());
+                }
+            }
+            else
+            {
+                //draw board
+                getBoard().render(graphics, hasIsometric());
             }
         }
         
         if (getNextPiece() != null)
         {
-            //calculate the coordinates where the render should start
-            int x = (int)(getBoard().getX() + (getNextPiece().getCol() * Block.WIDTH));
-            int y = (int)(getBoard().getY() + (getNextPiece().getRow() * Block.HEIGHT));
+            double x;
+            double y;
+            
+            if (hasIsometric())
+            {
+                //calculate the isometric coordinates where render should start
+                x = getBoard().getX() + Block.getIsometricX(getNextPiece());
+                y = getBoard().getY() + Block.getIsometricY(getNextPiece());
+            }
+            else
+            {
+                //calculate the 2d coordinates where the render should start
+                x = (int)(getBoard().getX() + (getNextPiece().getCol() * Block.WIDTH));
+                y = (int)(getBoard().getY() + (getNextPiece().getRow() * Block.HEIGHT));
+            }
             
             //render the piece
-            getNextPiece().render(x, y, graphics);
+            getNextPiece().render(graphics, x, y, hasIsometric());
         }
     }
 }

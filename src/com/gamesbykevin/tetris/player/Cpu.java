@@ -9,7 +9,9 @@ import com.gamesbykevin.tetris.engine.Engine;
 import java.awt.Graphics;
 
 /**
- * CPU opponent containing AI logic
+ * CPU opponent containing AI logic<br>
+ * The AI logic was inspired by this article
+ * https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
  * @author GOD
  */
 public final class Cpu extends Player implements Disposable
@@ -189,6 +191,14 @@ public final class Cpu extends Player implements Disposable
                         //if we hit a block move up 1 row
                         if (getBoard().hasBlock(getPiece()))
                             getPiece().decreaseRow();
+                        
+                        //if we still don't have bounds, continue
+                        if (!getBoard().hasBounds(getPiece()))
+                            continue;
+                        
+                        //if a block already exists at the location of the place
+                        if (getBoard().hasBlock(getPiece()))
+                            continue;
                         
                         //add piece to board
                         getBoard().addPiece(getPiece());

@@ -21,7 +21,7 @@ import java.awt.event.KeyEvent;
 public final class CustomMenu extends Menu implements IElement
 {
     //object used to switch container to full screen
-    private FullScreen fullScreen;
+    private FullScreen screen;
     
     //previous Layer key used so when container loses focus we remember where we were at
     private Object previousLayerKey;
@@ -32,7 +32,7 @@ public final class CustomMenu extends Menu implements IElement
     public enum OptionKey 
     {
         Sound, FullScreen, 
-        
+        Render
     }
     
     /**
@@ -45,22 +45,26 @@ public final class CustomMenu extends Menu implements IElement
         ExitGameConfirmed 
     }
     
-    /**
-     * Basic option selection on/off, must match text in menu.xml to work properly
-     */
-    public enum Toggle
-    {
-        Off, On 
-    }
+    //is full screen enabled
+    private boolean fullscreen = false;
     
-    //is full screen enabled, default false
-    //private Toggle fullscreen = Toggle.Off;
+    //is the sound enabled
+    private boolean sound = true;
     
-    //store the indec of the full screen setting
-    private int fullscreenIndex = 0;
+    //does the java container have focus
+    private boolean focus = true;
     
-    //does the container have focus
-    private Toggle focus = Toggle.On;
+    //values for sound
+    public static final int SOUND_ENABLED = 0;
+    public static final int SOUND_DISABLED = 1;
+    
+    //values for fullscreen
+    public static final int FULLSCREEN_ENABLED = 1;
+    public static final int FULLSCREEN_DISABLED = 0;
+    
+    //values for render
+    public static final int ISOMETRIC_ENABLED = 1;
+    public static final int ISOMETRIC_DISABLED = 0;
     
     //here the images for the mouse cursor will be contained
     private ImageManager images;
@@ -145,11 +149,149 @@ public final class CustomMenu extends Menu implements IElement
         //if the menu is not on the last layer we need to check for changes made in the menu
         if (!super.hasFinished())
         {
-            //the option selection for the sound and fullscreen
-            int tmpFullscreenIndex = fullscreenIndex;
+            //are we currently in one of these layers
+            boolean optionsInGame = super.hasCurrent(LayerKey.OptionsInGame);
+            boolean optionsMain = super.hasCurrent(LayerKey.Options);
             
-            //are we currently in the in-game options
-            final boolean isInGameOptionsLayer = super.hasCurrent(LayerKey.OptionsInGame);
+            //flag to check if anything changed
+            boolean changeSound = false;
+            boolean changeFullscreen = false;
+            boolean changeRender = false;
+            
+            if (optionsInGame)
+            {
+                //if setting is not what we have stored, there was a change
+                if (sound != (getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Sound) == SOUND_ENABLED))
+                    changeSound = true;
+                if (fullscreen != (getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.FullScreen) == FULLSCREEN_ENABLED))
+                    changeFullscreen = true;
+                
+                //make sure objects exist first
+                if (engine.getManager() != null && engine.getManager().getPlayers() != null)
+                {
+                    if (engine.getManager().getPlayers().hasIsometric() != (getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Render) == ISOMETRIC_ENABLED))
+                        changeRender = true;
+                }
+            }
+            else if (optionsMain)
+            {
+                //if setting is not what we have stored, there was a change
+                if (sound != (getOptionSelectionIndex(LayerKey.Options, OptionKey.Sound) == SOUND_ENABLED))
+                    changeSound = true;
+                if (fullscreen != (getOptionSelectionIndex(LayerKey.Options, OptionKey.FullScreen) == FULLSCREEN_ENABLED))
+                    changeFullscreen = true;
+                
+                //make sure objects exist first
+                if (engine.getManager() != null && engine.getManager().getPlayers() != null)
+                {
+                    if (engine.getManager().getPlayers().hasIsometric() != (getOptionSelectionIndex(LayerKey.Options, OptionKey.Render) == ISOMETRIC_ENABLED))
+                        changeRender = true;
+                }
+            }
+            
+            if (changeRender)
+            {
+                //flip current setting
+                engine.getManager().getPlayers().setIsometric(!engine.getManager().getPlayers().hasIsometric());
+                
+                //make sure other layer option setting matches current layer option
+                if (optionsInGame)
+                {
+                    //set option in other layer to match
+                    getOption(LayerKey.Options, OptionKey.Render).setIndex((engine.getManager().getPlayers().hasIsometric()) ? ISOMETRIC_ENABLED : ISOMETRIC_DISABLED);
+                    
+                    //flag a new image to be drawn for that layer
+                    getLayer(LayerKey.Options).resetOptionsImage();
+                }
+                else if (optionsMain)
+                {
+                    //set option in other layer to match
+                    getOption(LayerKey.OptionsInGame, OptionKey.Render).setIndex((engine.getManager().getPlayers().hasIsometric()) ? ISOMETRIC_ENABLED : ISOMETRIC_DISABLED);
+                    
+                    //flag a new image to be drawn for that layer
+                    getLayer(LayerKey.OptionsInGame).resetOptionsImage();
+                }
+            }
+            
+            //if a sound change was made
+            if (changeSound)
+            {
+                //flip setting
+                sound = !sound;
+                
+                //set the audio setting for this menu also
+                setEnabled(sound);
+                
+                if (engine.getResources() != null)
+                {
+                    //change was made so set opposite to our stored setting
+                    engine.getResources().setAudioEnabled(sound);
+
+                    //if sound is not enabled, stop all sound
+                    if (!sound)
+                        engine.getResources().stopAllSound();
+                }
+                
+                //make sure other layer option setting matches current layer option
+                if (optionsInGame)
+                {
+                    //set option in other layer to match
+                    getOption(LayerKey.Options, OptionKey.Sound).setIndex((sound) ? SOUND_ENABLED : SOUND_DISABLED);
+                    
+                    //flag a new image to be drawn for that layer
+                    getLayer(LayerKey.Options).resetOptionsImage();
+                }
+                else if (optionsMain)
+                {
+                    //set option in other layer to match
+                    getOption(LayerKey.OptionsInGame, OptionKey.Sound).setIndex((sound) ? SOUND_ENABLED : SOUND_DISABLED);
+                    
+                    //flag a new image to be drawn for that layer
+                    getLayer(LayerKey.OptionsInGame).resetOptionsImage();
+                }
+            }
+            
+            //if the full screen option changed
+            if (changeFullscreen)
+            {
+                //flip setting
+                fullscreen = !fullscreen;
+                
+                //create screen if null
+                if (screen == null)
+                    screen = new FullScreen();
+
+                //switch screen
+                if (engine.getMain().getApplet() != null)
+                {
+                    screen.switchFullScreen(engine.getMain().getApplet());
+                }
+                else
+                {
+                    screen.switchFullScreen(engine.getMain().getPanel());
+                }
+
+                //grab the rectangle coordinates of the full screen
+                engine.getMain().setFullScreen();
+                
+                //make sure other layer option setting matches current layer option
+                if (optionsInGame)
+                {
+                    //set option in other layer to match
+                    getOption(LayerKey.Options, OptionKey.FullScreen).setIndex((fullscreen) ? FULLSCREEN_ENABLED : FULLSCREEN_DISABLED);
+                    
+                    //flag a new image to be drawn for that layer
+                    getLayer(LayerKey.Options).resetOptionsImage();
+                }
+                else if (optionsMain)
+                {
+                    //set option in other layer to match
+                    getOption(LayerKey.OptionsInGame, OptionKey.FullScreen).setIndex((fullscreen) ? FULLSCREEN_ENABLED : FULLSCREEN_DISABLED);
+                    
+                    //flag a new image to be drawn for that layer
+                    getLayer(LayerKey.OptionsInGame).resetOptionsImage();
+                }
+            }
             
             //if starting a new game change layer, stop all sound
             if (super.hasCurrent(LayerKey.CreateNewGame))
@@ -158,64 +300,8 @@ public final class CustomMenu extends Menu implements IElement
                 super.setLayer(LayerKey.GameStart);
             }
             
-            //if we are in the in-game options layer
-            if (isInGameOptionsLayer)
-            {
-                //determine the current selection for sound
-                final Toggle tmp = Toggle.values()[getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Sound)];
-
-                //the first index is off, even though the menu says on
-                final boolean enabled = (tmp == Toggle.Off);
-                
-                //set the audio enabled/disabled depending on setting
-                engine.getResources().setAudioEnabled(enabled);
-                
-                if (!enabled)
-                    engine.getResources().stopAllSound();
-                
-                //if the audio is off then on, or on then off set the value in the menu
-                if (!isEnabled() && enabled || isEnabled() && !enabled)
-                {
-                    //set the audio enabled/disabled in the menu as well
-                    super.setEnabled(enabled);
-                }
-                
-                //get the setting for the fullscreen window
-                tmpFullscreenIndex = getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.FullScreen);
-            }
-                
-            //if on the options screen check fullscreen setting
-            if (super.hasCurrent(LayerKey.Options))
-                tmpFullscreenIndex = getOptionSelectionIndex(LayerKey.Options, OptionKey.FullScreen);
-            
-            //if the values are not equal to each other a change was made
-            if (tmpFullscreenIndex != fullscreenIndex)
-            {
-                if (fullScreen == null)
-                    fullScreen = new FullScreen();
-
-                //switch fullscreen
-                if (engine.getMain().getApplet() != null)
-                {
-                    fullScreen.switchFullScreen(engine.getMain().getApplet());
-                }
-                else
-                {
-                    fullScreen.switchFullScreen(engine.getMain().getPanel());
-                }
-                
-                //grab the rectangle coordinates of the full screen
-                engine.getMain().setFullScreen();
-
-                //store the new setting
-                this.fullscreenIndex = tmpFullscreenIndex;
-            }
-            
-            //does the container have focus
-            final Toggle tmpFocus = (engine.getMain().hasFocus()) ? Toggle.On : Toggle.Off;
-            
             //if the values are not equal a change was made
-            if (focus != tmpFocus)
+            if (focus != engine.getMain().hasFocus())
             {
                 //if the previous Layer is stored
                 if (previousLayerKey != null)
@@ -235,7 +321,7 @@ public final class CustomMenu extends Menu implements IElement
                     super.setLayer(LayerKey.NoFocus);
                 }
                 
-                this.focus = tmpFocus;
+                this.focus = !focus;
             }
             
             super.update(engine.getMouse(), engine.getKeyboard(), engine.getMain().getTime());
@@ -254,7 +340,7 @@ public final class CustomMenu extends Menu implements IElement
             if (super.hasFinished())
             {
                 //if we previously weren't in this layer reset the game
-                if (!isInGameOptionsLayer)
+                if (!optionsInGame)
                     engine.setReset();
             }
         }
@@ -271,7 +357,7 @@ public final class CustomMenu extends Menu implements IElement
     
     public boolean hasFocus()
     {
-        return (this.focus == Toggle.On);
+        return focus;
     }
     
     @Override
@@ -309,10 +395,10 @@ public final class CustomMenu extends Menu implements IElement
     {
         super.dispose();
         
-        if (fullScreen != null)
+        if (screen != null)
         {
-            fullScreen.dispose();
-            fullScreen = null;
+            screen.dispose();
+            screen = null;
         }
         
         if (images != null)

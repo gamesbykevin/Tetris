@@ -3,7 +3,6 @@ package com.gamesbykevin.tetris.player;
 import com.gamesbykevin.framework.input.Keyboard;
 import com.gamesbykevin.framework.resources.Disposable;
 
-import com.gamesbykevin.tetris.board.piece.Piece;
 import com.gamesbykevin.tetris.engine.Engine;
 
 import java.awt.Graphics;

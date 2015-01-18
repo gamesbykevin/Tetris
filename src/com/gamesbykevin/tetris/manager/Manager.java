@@ -35,7 +35,7 @@ public final class Manager implements IManager
     public Manager(final Engine engine) throws Exception
     {
         //set the audio depending on menu setting
-        engine.getResources().setAudioEnabled(Toggle.values()[engine.getMenu().getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Sound)] == Toggle.Off);
+        engine.getResources().setAudioEnabled(engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Sound) == CustomMenu.SOUND_ENABLED);
         
         //set the game window where game play will occur
         setWindow(engine.getMain().getScreen());
@@ -49,12 +49,27 @@ public final class Manager implements IManager
     {
         if (players == null)
         {
-            players = new Players();
+            //are we playing with multiple players
+            boolean multiple = false;
+            
+            //create players
+            players = new Players(multiple);
+            
+            //get the render setting
+            boolean isometric = engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Render) == CustomMenu.ISOMETRIC_ENABLED;
+            
+            //set the render
+            players.setIsometric(isometric);
         }
         else
         {
             players.reset();
         }
+    }
+    
+    public Players getPlayers()
+    {
+        return this.players;
     }
     
     @Override

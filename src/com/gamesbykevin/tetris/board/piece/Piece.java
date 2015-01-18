@@ -80,9 +80,9 @@ public final class Piece extends Sprite implements Disposable
              */
             case PIECE_TWO:
                 add(0, 0, PIECE_TWO_COLOR);
+                add(1, 0, PIECE_TWO_COLOR);
                 add(0, 1, PIECE_TWO_COLOR);
                 add(0, 2, PIECE_TWO_COLOR);
-                add(1, 2, PIECE_TWO_COLOR);
                 break;
                 
             /**
@@ -90,9 +90,9 @@ public final class Piece extends Sprite implements Disposable
              */
             case PIECE_THREE:
                 add(0,  0, PIECE_THREE_COLOR);
-                add(0,  1, PIECE_THREE_COLOR);
-                add(0,  2, PIECE_THREE_COLOR);
-                add(-1, 2, PIECE_THREE_COLOR);
+                add(1,  0, PIECE_THREE_COLOR);
+                add(1,  1, PIECE_THREE_COLOR);
+                add(1, 2, PIECE_THREE_COLOR);
                 break;
                 
             /**
@@ -297,39 +297,78 @@ public final class Piece extends Sprite implements Disposable
     }
     
     /**
+     * Render the blocks (for isometric rendering)
+     */
+    private void sortBlocks()
+    {
+        //were objects swapped
+        boolean swapped = true;
+        int j = 0;
+        
+        //continue as long as objects have been swapped
+        while (swapped)
+        {
+            swapped = false;
+            j++;
+            
+            //sort each block
+            for (int i = 0; i < getBlocks().size() - j; i++) 
+            {
+                //check if we can sort these 2 blocks
+                final Block block1 = getBlocks().get(i);
+                final Block block2 = getBlocks().get(i + 1);
+                
+                if (block1.getRow() > block2.getRow() || block1.getRow() >= block2.getRow() && block1.getCol() > block2.getCol())
+                {
+                    //swap objects
+                    getBlocks().set(i, block2);
+                    getBlocks().set(i + 1, block1);
+                    
+                    //flag that objects are swapped
+                    swapped = true;
+                }
+            }
+        }
+    }
+    
+    /**
      * Draw the piece.
+     * @param graphics Object used to draw image
      * @param x x-coordinate where piece starts
      * @param y y-coordinate where piece starts
-     * @param graphics Object used to draw image
      */
-    public void render(final int x, final int y, final Graphics graphics)
+    public void render(final Graphics graphics, final double x, final double y, final boolean isometric)
     {
-        for (int i = 0; i < getBlocks().size(); i++)
-        {
-            Block block = getBlocks().get(i);
-            
-            //set color
-            graphics.setColor(block.getColor());
-            
-            final int drawX = x + (int)(block.getCol() * Block.WIDTH);
-            final int drawY = y + (int)(block.getRow() * Block.HEIGHT);
-            
-            //fill the block
-            graphics.fillRect(drawX, drawY, Block.WIDTH, Block.HEIGHT);
-        }
+        //sort the blocks
+        sortBlocks();
         
+        //draw every block
         for (int i = 0; i < getBlocks().size(); i++)
         {
-            Block block = getBlocks().get(i);
+            //get the current block
+            final Block block = getBlocks().get(i);
             
-            //set outline color
-            graphics.setColor(Color.WHITE);
+            final double startX;
+            final double startY;
             
-            final int drawX = x + (int)(block.getCol() * Block.WIDTH);
-            final int drawY = y + (int)(block.getRow() * Block.HEIGHT);
-            
-            //fill the block
-            graphics.drawRect(drawX, drawY, Block.WIDTH, Block.HEIGHT);
+            if (isometric)
+            {
+                //isometric coordinates
+                startX = x + Block.getIsometricX(block);
+                startY = y + Block.getIsometricY(block);
+                
+                //draw block
+                block.renderIsometric(graphics, startX, startY);
+            }
+            else
+            {
+                //2d coordinates of this block
+                startX = x + (block.getCol() * Block.WIDTH);
+                startY = y + (block.getRow() * Block.HEIGHT);
+                
+                //draw block
+                block.render2d(graphics, (int)startX, (int)startY);
+            }
         }
     }
 }

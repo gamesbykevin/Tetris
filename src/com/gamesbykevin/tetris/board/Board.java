@@ -3,11 +3,11 @@ package com.gamesbykevin.tetris.board;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 
-import com.gamesbykevin.tetris.player.Cpu;
 import com.gamesbykevin.tetris.board.piece.*;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Polygon;
 
 /**
  * This is the board where the tetris pieces will be placed
@@ -26,11 +26,17 @@ public final class Board extends Sprite implements Disposable
     public static final int START_COL = (COLS / 2);
     public static final int START_ROW = 0;
     
+    //area at top where we check to see if a block exists for gameover
+    public static final int START_RANGE = 2;
+    
     //do we have a complete line
     private boolean complete = false;
     
     //the number of lines completed
     private int lines = 0;
+    
+    //the background of the board for 2d and isometric
+    private Polygon background2d, backgroundIso;
     
     public Board()
     {
@@ -461,8 +467,18 @@ public final class Board extends Sprite implements Disposable
         return false;
     }
         
-    private boolean hasBlock(final int col, final int row)
+    /**
+     * Does the block exist
+     * @param col column
+     * @param row row
+     * @return true if a block exists at the specified location (col, row), false otherwise
+     */
+    public boolean hasBlock(final int col, final int row)
     {
+        //if the location is out of bounds we can't have a block
+        if (!hasBounds(col, row))
+            return false;
+        
         return (getBlock(col, row) != null);
     }
     
@@ -489,60 +505,76 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Draw the board
-     * @param graphics 
+     * Assign background coordinates for board outline
      */
-    public void render(final Graphics graphics)
+    private void assignBackground()
     {
-        int startX = (int)getX();
-        int startY = (int)getY();
+        if (this.background2d == null)
+        {
+            this.background2d = new Polygon();
+            this.background2d.addPoint((int)getX(), (int)getY());
+            this.background2d.addPoint((int)(getX() + getWidth()), (int)getY());
+            this.background2d.addPoint((int)(getX() + getWidth()), (int)(getY() + getHeight()));
+            this.background2d.addPoint((int)getX(), (int)(getY() + getHeight()));
+        }
+        
+        if (this.backgroundIso == null)
+        {
+            this.backgroundIso = new Polygon();
+            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, 0)), (int)(getY() + Block.getIsometricY(0, 0)));
+            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(Board.COLS, 0)), (int)(getY() + Block.getIsometricY(Board.COLS, 0)));
+            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(Board.COLS, Board.ROWS - 1)), (int)(getY() + Block.getIsometricY(Board.COLS, Board.ROWS - 1)));
+            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, Board.ROWS - 1)), (int)(getY() + Block.getIsometricY(0, Board.ROWS - 1)));
+        }
+    }
+    
+    /**
+     * Draw the board
+     * @param graphics Object used to draw board
+     * @param isometric Do we render the board isometric (true) or 2d (false)?
+     */
+    public void render(final Graphics graphics, final boolean isometric)
+    {
+        //set color of outline
+        graphics.setColor(Color.WHITE);
+        
+        //assign background outline coordinates
+        assignBackground();
+        
+        //draw the board outline
+        graphics.drawPolygon((isometric) ? backgroundIso : background2d);
         
         //draw blocks
-        for (int col = 0; col < board[0].length; col++)
+        for (int row = 0; row < board.length; row++)
         {
-            for (int row = 0; row < board.length; row++)
+            for (int col = 0; col < board[0].length; col++)
             {
                 //only draw block if we have one
                 if (hasBlock(col, row))
                 {
-                    //calculate drawing coordinate
-                    int drawX = startX + (col * Block.WIDTH);
-                    int drawY = startY + (row * Block.HEIGHT);
+                    final double drawX;
+                    final double drawY;
                     
-                    //set color
-                    graphics.setColor(getBlock(col, row).getColor());
-
-                    //fill block
-                    graphics.fillRect(drawX, drawY, Block.WIDTH, Block.HEIGHT);
+                    if (isometric)
+                    {
+                        //isometric coordinates
+                        drawX = getX() + Block.getIsometricX(col, row);
+                        drawY = getY() + Block.getIsometricY(col, row);
+                        
+                        //draw block
+                        getBlock(col, row).renderIsometric(graphics, (int)drawX, (int)drawY);
+                    }
+                    else
+                    {
+                        //calculate coordinates, 2d coordinates.
+                        drawX = getX() + (col * Block.WIDTH);
+                        drawY = getY() + (row * Block.HEIGHT);
+                        
+                        //draw block
+                        getBlock(col, row).render2d(graphics, (int)drawX, (int)drawY);
+                    }
                 }
             }
         }
-        
-        //draw block outline
-        for (int col = 0; col < board[0].length; col++)
-        {
-            for (int row = 0; row < board.length; row++)
-            {
-                //only draw outline if we have a block
-                //if (hasBlock(col, row))
-                //{
-                    //calculate drawing coordinate
-                    int drawX = startX + (col * Block.WIDTH);
-                    int drawY = startY + (row * Block.HEIGHT);
-
-                    //set outline color
-                    graphics.setColor(Color.WHITE);
-
-                    //draw outline
-                    graphics.drawRect(drawX, drawY, Block.WIDTH, Block.HEIGHT);
-                //}
-            }
-        }
-        
-        //set color of outline
-        graphics.setColor(Color.WHITE);
-        
-        //now draw outline of board
-        graphics.drawRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
     }
 }

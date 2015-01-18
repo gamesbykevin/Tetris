@@ -50,12 +50,14 @@
         <title>Options</title>
         <backgroundMusicLocation></backgroundMusicLocation>
         <optionSoundLocation>resources/audio/menu/sound/selection.wav</optionSoundLocation>
-        <!--
-        <options name="Display Details: " id="EnableDetail">
-            <option>Yes</option>
-            <option>No</option>
+        <options name="Render: " id="Render">
+            <option>2D</option>
+            <option>Isometric</option>
         </options>
-        -->
+        <options name="Sound: " id="Sound">
+            <option>On</option>
+            <option>Off</option>
+        </options>
         <options name="Full Screen: " id="FullScreen">
             <option>Off</option>
             <option>On</option>
@@ -91,6 +93,10 @@
         <backgroundMusicLocation></backgroundMusicLocation>
         <optionSoundLocation>resources/audio/menu/sound/selection.wav</optionSoundLocation>
         <options name="Resume" id="Resume" next="GameStart"></options>
+        <options name="Render: " id="Render">
+            <option>2D</option>
+            <option>Isometric</option>
+        </options>
         <options name="Sound: " id="Sound">
             <option>On</option>
             <option>Off</option>
