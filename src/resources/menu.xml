@@ -71,7 +71,7 @@
             <option>Very Hard</option>
         </options>
         <options name="Render: " id="Render">
-            <option>2 Dimensional</option>
+            <option>2-D</option>
             <option>Isometric</option>
         </options>
         <options name="Music: " id="Music">

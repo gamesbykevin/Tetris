@@ -163,6 +163,30 @@ public final class Piece extends Sprite implements Disposable
     }
     
     /**
+     * Is this piece between the minimum, maximum columns on the tetris board?
+     * @return True if all blocks that make the piece are within the min,max of the board
+     */
+    public boolean hasVerticalBounds()
+    {
+        for (int i = 0; i < getBlocks().size(); i++)
+        {
+            //get the current block
+            final Block block = getBlocks().get(i);
+            
+            //if the column is less than the minimum
+            if (getCol() + block.getCol() < 0)
+                return false;
+            
+            //if the column is greater than the maximum
+            if (getCol() + block.getCol() >= Board.COLS)
+                return false;
+        }
+        
+        //none of the blocks are out of bounds
+        return true;
+    }
+    
+    /**
      * Is any block in this piece above the ceiling
      * @return true if at least 1 block has a row less than 0, false otherwise
      */

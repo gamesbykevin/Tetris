@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
-/**
+/** 
  * This is the board where the tetris pieces will be placed
  * @author GOD
  */
@@ -599,6 +599,9 @@ public final class Board extends Sprite implements Disposable
                         //isometric coordinates
                         drawX = getX() + Block.getIsometricX(col, row);
                         drawY = getY() + Block.getIsometricY(col, row);
+                        
+                        //drawX = getX() + (col * Block.WIDTH);
+                        //drawY = getY() + (row * Block.HEIGHT);
                         
                         //draw block
                         getBlock(col, row).renderIsometric(graphics, (int)drawX, (int)drawY);

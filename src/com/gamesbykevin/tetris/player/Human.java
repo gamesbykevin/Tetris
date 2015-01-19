@@ -61,7 +61,7 @@ public final class Human extends Player implements Disposable
                 getPiece().decreaseCol();
                 
                 //if we are out of bounds or intersecting another block on the board
-                if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                if (!getBoard().hasBounds(getPiece()) && !getPiece().hasVerticalBounds() || getBoard().hasBlock(getPiece()))
                 {
                     //move piece back to previous
                     getPiece().increaseCol();
@@ -76,7 +76,7 @@ public final class Human extends Player implements Disposable
                 getPiece().increaseCol();
 
                 //if we are out of bounds or intersecting another block on the board
-                if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
+                if (!getBoard().hasBounds(getPiece()) && !getPiece().hasVerticalBounds() || getBoard().hasBlock(getPiece()))
                 {
                     //move piece back to previous
                     getPiece().decreaseCol();
