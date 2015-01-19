@@ -16,9 +16,8 @@ public final class GameImages extends ImageManager
      */
     public enum Keys
     {
-        /*
-        TruckRed, TruckBlue, TruckOrange, TruckGreen,
-        */
+        Background1,Background2, Background3,Background4,
+        Background5,Background6, Background7,Background8,
     }
     
     public GameImages() throws Exception

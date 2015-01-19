@@ -37,9 +37,9 @@ public final class Cpu extends Player implements Disposable
     //bumpiness score weight
     private static final double WEIGHT_BUMPINESS = -0.24077;
     
-    public Cpu()
+    public Cpu(final int modeIndex)
     {
-        super();
+        super(modeIndex, "Cpu", false);
     }
     
     @Override
@@ -137,8 +137,7 @@ public final class Cpu extends Player implements Disposable
                 }
                 else
                 {
-                    //automatically expire timer so piece drops, since we are now in place
-                    getTimer().setRemaining(0);
+                    //the piece will drop here, don't need to do anything
                 }
             }
         }

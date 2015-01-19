@@ -16,6 +16,7 @@ public final class GameAudio extends AudioManager
      */
     public enum Keys
     {
+        Clear, Move, Place, Rotate
         /*
         Engine, EngineLoop, Lap, EngineSlow, Horn, Turn, 
         */

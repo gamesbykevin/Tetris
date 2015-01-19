@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <sounds>
+    <sound id="Clear">resources/audio/game/clear.wav</sound>
+    <sound id="Move">resources/audio/game/move.wav</sound>
+    <sound id="Place">resources/audio/game/place.wav</sound>
+    <sound id="Rotate">resources/audio/game/rotate.wav</sound>
     <!--
     <sound id="MusicTheme">resources/audio/game/music/Theme.mp3</sound>
     <sound id="Engine">resources/audio/game/engine.wav</sound>

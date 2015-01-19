@@ -1,5 +1,6 @@
 package com.gamesbykevin.tetris.player;
 
+import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 import com.gamesbykevin.framework.util.Timer;
 import com.gamesbykevin.framework.util.Timers;
@@ -8,6 +9,7 @@ import com.gamesbykevin.tetris.board.Board;
 import com.gamesbykevin.tetris.board.piece.Block;
 import com.gamesbykevin.tetris.board.piece.Piece;
 import com.gamesbykevin.tetris.engine.Engine;
+import com.gamesbykevin.tetris.resources.GameAudio;
 import com.gamesbykevin.tetris.shared.IElement;
 
 import java.awt.Graphics;
@@ -16,7 +18,7 @@ import java.awt.Graphics;
  * This class will represent the player
  * @author GOD
  */
-public abstract class Player implements Disposable, IElement
+public abstract class Player extends Sprite implements Disposable, IElement
 {
     //the players board
     private Board board;
@@ -34,10 +36,10 @@ public abstract class Player implements Disposable, IElement
     private Timer complete;
     
     //default time between piece drops
-    private static final long DEFAULT_PIECE_DROP_DELAY = Timers.toNanoSeconds(200L);
-
+    protected static final long DEFAULT_PIECE_DROP_DELAY = Timers.toNanoSeconds(1000L);
+    
     //default time to show a completed line(s)
-    private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(0);
+    private static final long COMPLETED_LINE_DELAY = Timers.toNanoSeconds(1000L);
     
     //is the game finished for the player (meaning the board crashed)
     private boolean gameover = false;
@@ -45,8 +47,29 @@ public abstract class Player implements Disposable, IElement
     //do we render isometric
     private boolean isometric = false;
     
-    protected Player()
+    //the game game we are playing
+    private final int modeIndex;
+    
+    //the text description of player
+    private final String name;
+    
+    //store game stats here
+    private Stats stats;
+    
+    //is this player human
+    private final boolean human;
+    
+    protected Player(final int modeIndex, final String name, final boolean human)
     {
+        //store the game mode
+        this.modeIndex = modeIndex;
+        
+        //store the player name description
+        this.name = name;
+        
+        //is this player human
+        this.human = human;
+        
         //create a new board
         this.board = new Board();
         
@@ -55,6 +78,9 @@ public abstract class Player implements Disposable, IElement
         
         //create timer to track completed line
         this.complete = new Timer(COMPLETED_LINE_DELAY);
+        
+        //create object for game stats
+        this.stats = new Stats(getModeIndex());
     }
     
     public void reset() throws Exception
@@ -71,6 +97,42 @@ public abstract class Player implements Disposable, IElement
         
         //game is not over
         setGameover(false);
+    }
+    
+    /**
+     * Is this player human
+     * @return true - yes, false otherwise
+     */
+    public boolean isHuman()
+    {
+        return this.human;
+    }
+    
+    /**
+     * Get game stats
+     * @return Object representing game stats for this player
+     */
+    public Stats getStats()
+    {
+        return this.stats;
+    }
+    
+    /**
+     * Get the description of the player
+     * @return The text description of this player
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+    
+    /**
+     * Get the mode of play
+     * @return Index of the mode playing
+     */
+    public final int getModeIndex()
+    {
+        return this.modeIndex;
     }
     
     /**
@@ -135,7 +197,7 @@ public abstract class Player implements Disposable, IElement
      */
     protected void createNextPiece(final int type) throws Exception
     {
-        this.next = new Piece(Board.COLS + 2, Board.START_ROW, type);
+        this.next = new Piece(Board.COLS + 2, Board.START_ROW + Board.ROWS - 3, type);
     }
     
     /**
@@ -162,6 +224,9 @@ public abstract class Player implements Disposable, IElement
      */
     protected void updateBasic(final Engine engine) throws Exception
     {
+        //update stats
+        getStats().update(this, engine.getMain().getTime());
+        
         //if the human does not have a tetris piece, create one
         if (getPiece() == null && !getBoard().hasComplete())
         {
@@ -204,6 +269,9 @@ public abstract class Player implements Disposable, IElement
                         }
                         else
                         {
+                            //fill piece where possible
+                            getBoard().fillPiece(getPiece());
+                            
                             //we are placing a piece over another, it is gameover
                             setGameover(true);
                         }
@@ -218,8 +286,17 @@ public abstract class Player implements Disposable, IElement
                                 setGameover(true);
                         }
                         
-                        //check for a complete line
-                        getBoard().markCompletedRow();
+                        //check and mark for a complete line
+                        if (getBoard().markCompletedRow())
+                        {
+                            //play sound effect
+                            engine.getResources().playGameAudio(GameAudio.Keys.Clear);
+                        }
+                        else
+                        {
+                            //play sound effect
+                            engine.getResources().playGameAudio(GameAudio.Keys.Place);
+                        }
 
                         //now remove the piece
                         removePiece();
@@ -310,6 +387,8 @@ public abstract class Player implements Disposable, IElement
     @Override
     public void dispose()
     {
+        super.dispose();
+        
         if (board != null)
         {
             board.dispose();
@@ -326,6 +405,12 @@ public abstract class Player implements Disposable, IElement
         {
             next.dispose();
             next = null;
+        }
+        
+        if (stats != null)
+        {
+            stats.dispose();
+            stats = null;
         }
         
         if (timer != null)
@@ -402,6 +487,11 @@ public abstract class Player implements Disposable, IElement
             
             //render the piece
             getNextPiece().render(graphics, x, y, hasIsometric());
+        }
+        
+        if (getStats() != null)
+        {
+            getStats().render(graphics);
         }
     }
 }

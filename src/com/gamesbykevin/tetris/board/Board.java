@@ -4,8 +4,8 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 
 import com.gamesbykevin.tetris.board.piece.*;
-
 import java.awt.Color;
+
 import java.awt.Graphics;
 import java.awt.Polygon;
 
@@ -63,8 +63,8 @@ public final class Board extends Sprite implements Disposable
     }
     
     /**
-     * Get the number of lines completed
-     * @return The total number of lines completed
+     * Get the number of lines completed overall
+     * @return The total number of lines completed overall
      */
     public int getLines()
     {
@@ -104,6 +104,36 @@ public final class Board extends Sprite implements Disposable
                     //if the block belongs to the piece, remove it
                     if (getBlock(col, row).getId() == piece.getId())
                         setBlock(col, row, null);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Add the piece to the board where there isn't a block.<br>
+     * This is used to add the last piece before a player has gameover
+     * @param piece The piece we want to add
+     */
+    public void fillPiece(final Piece piece)
+    {
+        //add each block to the board where we can
+        for (int i = 0; i < piece.getBlocks().size(); i++)
+        {
+            //get the current block
+            Block block = piece.getBlocks().get(i);
+            
+            //calculate location for block
+            int col = (int)(block.getCol() + piece.getCol());
+            int row = (int)(block.getRow() + piece.getRow());
+            
+            //make sure we aren't placing this specific block out of bounds
+            if (hasBounds(col, row))
+            {
+                //also make sure there isn't already a block here
+                if (!hasBlock(col, row))
+                {
+                    //add block at location
+                    setBlock(col, row, block);
                 }
             }
         }
@@ -290,8 +320,9 @@ public final class Board extends Sprite implements Disposable
     
     /**
      * Check the board for a completed row and flag if there is at least 1 completed row
+     * @return Will return true if at least 1 line is complete, false otherwise
      */
-    public void markCompletedRow()
+    public boolean markCompletedRow()
     {
         for (int row = 0; row < board.length; row++)
         {
@@ -301,10 +332,13 @@ public final class Board extends Sprite implements Disposable
                 //flag complete
                 setComplete(true);
                 
-                //exit loop
-                break;
+                //exit
+                return true;
             }
         }
+        
+        //no completed rows
+        return false;
     }
     
     /**
@@ -502,30 +536,32 @@ public final class Board extends Sprite implements Disposable
         }
         
         board = null;
+        background2d = null;
+        backgroundIso = null;
     }
     
     /**
      * Assign background coordinates for board outline
      */
-    private void assignBackground()
+    public void assignBackground()
     {
         if (this.background2d == null)
-        {
             this.background2d = new Polygon();
+        
+        if (this.backgroundIso == null)
+            this.backgroundIso = new Polygon();
+        
+            this.background2d.reset();
             this.background2d.addPoint((int)getX(), (int)getY());
             this.background2d.addPoint((int)(getX() + getWidth()), (int)getY());
             this.background2d.addPoint((int)(getX() + getWidth()), (int)(getY() + getHeight()));
             this.background2d.addPoint((int)getX(), (int)(getY() + getHeight()));
-        }
-        
-        if (this.backgroundIso == null)
-        {
-            this.backgroundIso = new Polygon();
-            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, 0)), (int)(getY() + Block.getIsometricY(0, 0)));
+            
+            this.backgroundIso.reset();
+            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, -1)), (int)(getY() + Block.getIsometricY(0, -1)));
             this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(Board.COLS, 0)), (int)(getY() + Block.getIsometricY(Board.COLS, 0)));
             this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(Board.COLS, Board.ROWS - 1)), (int)(getY() + Block.getIsometricY(Board.COLS, Board.ROWS - 1)));
             this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, Board.ROWS - 1)), (int)(getY() + Block.getIsometricY(0, Board.ROWS - 1)));
-        }
     }
     
     /**
@@ -535,11 +571,14 @@ public final class Board extends Sprite implements Disposable
      */
     public void render(final Graphics graphics, final boolean isometric)
     {
+        //set background color
+        graphics.setColor(Color.BLACK);
+        
+        //fill the board outline
+        graphics.fillPolygon((isometric) ? backgroundIso : background2d);
+        
         //set color of outline
         graphics.setColor(Color.WHITE);
-        
-        //assign background outline coordinates
-        assignBackground();
         
         //draw the board outline
         graphics.drawPolygon((isometric) ? backgroundIso : background2d);

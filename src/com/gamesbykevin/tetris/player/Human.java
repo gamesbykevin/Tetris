@@ -4,6 +4,7 @@ import com.gamesbykevin.framework.input.Keyboard;
 import com.gamesbykevin.framework.resources.Disposable;
 
 import com.gamesbykevin.tetris.engine.Engine;
+import com.gamesbykevin.tetris.resources.GameAudio;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -14,9 +15,9 @@ import java.awt.event.KeyEvent;
  */
 public final class Human extends Player implements Disposable
 {
-    public Human()
+    public Human(final int modeIndex)
     {
-        super();
+        super(modeIndex, "Human", true);
     }
     
     @Override
@@ -37,11 +38,28 @@ public final class Human extends Player implements Disposable
             //get keyboard input
             final Keyboard keyboard = engine.getKeyboard();
 
+            if (keyboard.hasKeyReleased(KeyEvent.VK_LEFT) || keyboard.hasKeyReleased(KeyEvent.VK_RIGHT))
+            {
+                keyboard.removeKeyReleased(KeyEvent.VK_LEFT);
+                keyboard.removeKeyReleased(KeyEvent.VK_RIGHT);
+                
+                //play sound effect
+                engine.getResources().playGameAudio(GameAudio.Keys.Move);
+            }
+            
+            if (keyboard.hasKeyReleased(KeyEvent.VK_UP))
+            {
+                keyboard.removeKeyReleased(KeyEvent.VK_UP);
+                
+                //play sound effect
+                engine.getResources().playGameAudio(GameAudio.Keys.Rotate);
+            }
+            
             if (keyboard.hasKeyPressed(KeyEvent.VK_LEFT))
             {
                 //move piece west
                 getPiece().decreaseCol();
-
+                
                 //if we are out of bounds or intersecting another block on the board
                 if (!getBoard().hasBounds(getPiece()) || getBoard().hasBlock(getPiece()))
                 {

@@ -27,9 +27,9 @@
         <force>false</force>
         <pause>true</pause>
         <duration>15000</duration>
-        <image>resources/images/menu/title.png</image>
-        <optionContainerRatio>0.75</optionContainerRatio>
-        <optionBorderThickness>1.5</optionBorderThickness>
+        <image>resources/images/menu/title.jpg</image>
+        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionBorderThickness>5</optionBorderThickness>
         <title>Tetris</title>
         <backgroundMusicLocation></backgroundMusicLocation>
         <optionSoundLocation>resources/audio/menu/sound/selection.wav</optionSoundLocation>
@@ -44,14 +44,27 @@
         <force>false</force>
         <pause>true</pause>
         <duration>10000</duration>
-        <image>resources/images/menu/untitled.png</image>
-        <optionContainerRatio>0.75</optionContainerRatio>
-        <optionBorderThickness>1.5</optionBorderThickness>
+        <image>resources/images/menu/title.jpg</image>
+        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionBorderThickness>5</optionBorderThickness>
         <title>Options</title>
         <backgroundMusicLocation></backgroundMusicLocation>
         <optionSoundLocation>resources/audio/menu/sound/selection.wav</optionSoundLocation>
+        <options name="Mode: " id="Mode">
+            <option>Normal</option>
+            <option>Infinite</option>
+            <option>Timed "Versus"</option>
+            <option>Tug of War "Versus"</option>
+        </options>
+        <options name="Difficulty: " id="Difficulty">
+            <option>Very Easy</option>
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+            <option>Very Hard</option>
+        </options>
         <options name="Render: " id="Render">
-            <option>2D</option>
+            <option>2 Dimensional</option>
             <option>Isometric</option>
         </options>
         <options name="Sound: " id="Sound">
@@ -87,8 +100,8 @@
         <pause>true</pause>
         <duration></duration>
         <image></image>
-        <optionContainerRatio>0.75</optionContainerRatio>
-        <optionBorderThickness>1.5</optionBorderThickness>
+        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionBorderThickness>5</optionBorderThickness>
         <title>Options</title>
         <backgroundMusicLocation></backgroundMusicLocation>
         <optionSoundLocation>resources/audio/menu/sound/selection.wav</optionSoundLocation>
@@ -114,8 +127,8 @@
         <pause>true</pause>
         <duration></duration>
         <image></image>
-        <optionContainerRatio>0.75</optionContainerRatio>
-        <optionBorderThickness>1.5</optionBorderThickness>
+        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionBorderThickness>5</optionBorderThickness>
         <title>Reset?</title>
         <options name="Yes" next="CreateNewGame" id="CreateNewGame"></options>
         <options name="No" next="OptionsInGame" id="OptionsInGame"></options>
@@ -128,8 +141,8 @@
         <pause>true</pause>
         <duration></duration>
         <image></image>
-        <optionContainerRatio>0.75</optionContainerRatio>
-        <optionBorderThickness>1.5</optionBorderThickness>
+        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionBorderThickness>5</optionBorderThickness>
         <title>Leave?</title>
         <options name="Yes" next="ExitGameConfirmed" id="MainTitle"></options>
         <options name="No" next="OptionsInGame" id="OptionsInGame"></options>

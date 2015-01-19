@@ -153,6 +153,11 @@ public final class Resources implements IResources
         return images.get(key);
     }
     
+    /**
+     * Get the text file
+     * @param key The unique key of the text file we want
+     * @return Text file
+     */
     public Text getGameText(final Object key)
     {
         return textFiles.get(key);
@@ -160,24 +165,38 @@ public final class Resources implements IResources
     
     /**
      * Play game audio with no loop
-     * @param key 
+     * @param key The unique key of the audio we want to play
      */
     public void playGameAudio(final Object key)
     {
         playGameAudio(key, false);
     }
     
+    /**
+     * Play game audio
+     * @param key The unique key of the audio we want to play
+     * @param loop Does the audio loop
+     */
     public void playGameAudio(final Object key, final boolean loop)
     {
         audio.play(key, loop);
     }
     
+    /**
+     * Stop playing audio
+     * @param key The unique key of the audio we want to stop playing
+     */
     public void stopGameAudio(final Object key)
     {
         audio.stop(key);
     }
     
-    public Font getFont(final Object key)
+    /**
+     * Get the game font
+     * @param key The unique key of the object we want
+     * @return The specified game font
+     */
+    public Font getGameFont(final Object key)
     {
         return fonts.get(key);
     }

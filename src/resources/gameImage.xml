@@ -3,4 +3,12 @@
     <!--
     <image id="Cursor">resources/images/game/cursor.gif</image>
     -->
+    <image id="Background1">resources/images/game/background1.jpg</image>
+    <image id="Background2">resources/images/game/background2.jpg</image>
+    <image id="Background3">resources/images/game/background3.jpg</image>
+    <image id="Background4">resources/images/game/background4.jpg</image>
+    <image id="Background5">resources/images/game/background5.jpg</image>
+    <image id="Background6">resources/images/game/background6.jpg</image>
+    <image id="Background7">resources/images/game/background7.jpg</image>
+    <image id="Background8">resources/images/game/background8.jpg</image>
 </images>

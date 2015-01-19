@@ -32,7 +32,7 @@ public final class CustomMenu extends Menu implements IElement
     public enum OptionKey 
     {
         Sound, FullScreen, 
-        Render
+        Render, Mode, Difficulty
     }
     
     /**
@@ -65,6 +65,19 @@ public final class CustomMenu extends Menu implements IElement
     //values for render
     public static final int ISOMETRIC_ENABLED = 1;
     public static final int ISOMETRIC_DISABLED = 0;
+    
+    //different game modes
+    public static final int GAME_MODE_NORMAL = 0;
+    public static final int GAME_MODE_INFINITE = 1;
+    public static final int GAME_MODE_TIMED = 2;
+    public static final int GAME_MODE_TUG_OF_WAR = 3;
+    
+    //the different difficulty levels
+    public static final int GAME_DIFFICULTY_VERY_EASY = 0;
+    public static final int GAME_DIFFICULTY_EASY = 1;
+    public static final int GAME_DIFFICULTY_MEDIUM = 2;
+    public static final int GAME_DIFFICULTY_HARD = 3;
+    public static final int GAME_DIFFICULTY_VERY_HARD = 4;
     
     //here the images for the mouse cursor will be contained
     private ImageManager images;
