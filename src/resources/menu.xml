@@ -37,7 +37,14 @@
         <options name="Options" next="Options" id="Options"></options>
         <options name="Controls" next="Controls" id="Controls"></options>
         <options name="Instructions" next="Instructions" id="Instructions"></options>
-        <options name="Credits" next="Credits" id="Credits"></options>
+        <options name="Credits" next="StaticCredits" id="Credits"></options>
+    </layer>
+    <layer id="StaticCredits" next="MainTitle">
+        <transition>NONE</transition>
+        <force>false</force>
+        <pause>true</pause>
+        <duration></duration>
+        <image>resources/images/menu/credit.png</image>
     </layer>
     <layer id="Options">
         <transition>NONE</transition>
@@ -76,7 +83,7 @@
             <option>Song 6</option>
             <option>Off</option>
         </options>
-        <options name="Sound: " id="Sound">
+        <options name="All Sound: " id="Sound">
             <option>On</option>
             <option>Off</option>
         </options>
@@ -93,12 +100,19 @@
         <duration></duration>
         <image>resources/images/menu/controls.png</image>
     </layer>
-    <layer id="Instructions" next="MainTitle">
+    <layer id="Instructions" next="Instructions1">
         <transition>NONE</transition>
         <force>false</force>
         <pause>true</pause>
         <duration></duration>
         <image>resources/images/menu/instructions.png</image>
+    </layer>
+    <layer id="Instructions1" next="MainTitle">
+        <transition>NONE</transition>
+        <force>false</force>
+        <pause>true</pause>
+        <duration></duration>
+        <image>resources/images/menu/instructions1.png</image>
     </layer>
     <layer id="GameStart">
         <!-- THIS LAYER IS INTENTIONALLY LEFT BLANK, THIS IS WHERE MAIN GAMEPLAY WILL START -->
@@ -119,7 +133,7 @@
             <option>2D</option>
             <option>Isometric</option>
         </options>
-        <options name="Sound: " id="Sound">
+        <options name="All Sound: " id="Sound">
             <option>On</option>
             <option>Off</option>
         </options>
