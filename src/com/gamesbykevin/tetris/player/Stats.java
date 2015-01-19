@@ -3,8 +3,6 @@ package com.gamesbykevin.tetris.player;
 import com.gamesbykevin.framework.resources.Disposable;
 import com.gamesbykevin.framework.util.Timer;
 import com.gamesbykevin.framework.util.Timers;
-import com.gamesbykevin.tetris.board.Board;
-import com.gamesbykevin.tetris.board.piece.Block;
 
 import com.gamesbykevin.tetris.menu.CustomMenu;
 import java.awt.Color;
@@ -13,7 +11,6 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 
 /**
  * This class will display the player stats on-screen
@@ -24,8 +21,8 @@ public final class Stats implements Disposable
     //timer for our game
     private Timer gameTimer;
     
-    //timed mode will be 3 minutes long
-    private static final long TIMED_MODE_DELAY = Timers.toNanoSeconds(3);
+    //timed mode will be 2 minutes long
+    private static final long TIMED_MODE_DELAY = Timers.toNanoSeconds(2);
     
     //the image we render the time on
     private BufferedImage timeImage;
@@ -42,6 +39,9 @@ public final class Stats implements Disposable
     //image of player health (tug-of-war mode only)
     private BufferedImage healthImage;
     
+    //the image that will display winner/loser
+    private BufferedImage resultImage;
+    
     //game font
     private Font font;
     
@@ -56,11 +56,11 @@ public final class Stats implements Disposable
     private long passed;
     
     //image dimensions
-    private static final int IMAGE_WIDTH = 145;
+    private static final int IMAGE_WIDTH = 150;
     private static final int IMAGE_HEIGHT = 25;
     
     //the offset where the stats will be drawn
-    private static final int OFFSET_X = 240;
+    private static final int OFFSET_X = 230;
     private static final int OFFSET_Y = 225;
     
     //the pixels to offset each individual stat
@@ -200,6 +200,29 @@ public final class Stats implements Disposable
     }
 
     /**
+     * Create the result image that will display lose or victory
+     * @param win True if we won, false otherwise
+     */
+    public void renderResultImage(final boolean win)
+    {
+        resultImage = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT * 2, BufferedImage.TYPE_INT_ARGB);
+        
+        //get graphics object to write image
+        Graphics2D g2d = resultImage.createGraphics();
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, resultImage.getWidth(), resultImage.getHeight());
+        
+        //set font if available
+        if (getFont() != null)
+            g2d.setFont(getFont());
+        
+        //draw info
+        g2d.setColor((win) ? Color.GREEN : Color.RED);
+        g2d.drawString((win) ? "Winner" : "Loser", OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+        g2d.drawString("Press \"esc\"", OFFSET_STAT_X, (IMAGE_HEIGHT * 2) - 1);
+    }
+    
+    /**
      * Update display image
      */
     private void renderNameImage()
@@ -210,7 +233,7 @@ public final class Stats implements Disposable
         //get graphics object to write image
         Graphics2D g2d = this.nameImage.createGraphics();
         g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+        g2d.fillRect(0, 0, nameImage.getWidth(), nameImage.getHeight());
         
         //set font if available
         if (getFont() != null)
@@ -320,7 +343,7 @@ public final class Stats implements Disposable
     /**
      * Update the game timer
      * @param player The current player
-     * @param time nano-seconds per each update
+     * @param time nanoseconds per each update
      */
     protected void update(final Player player, final long time)
     {
@@ -408,6 +431,8 @@ public final class Stats implements Disposable
     
     protected void render(final Graphics graphics)
     {
+        if (resultImage != null)
+            graphics.drawImage(resultImage, (int)x, (int)y + (-2 * IMAGE_HEIGHT), null);
         if (nameImage != null)
             graphics.drawImage(nameImage,   (int)x, (int)y + (0 * IMAGE_HEIGHT), null);
         if (levelImage != null)

@@ -7,6 +7,7 @@ import com.gamesbykevin.tetris.board.Board;
 import com.gamesbykevin.tetris.board.piece.Block;
 import com.gamesbykevin.tetris.engine.Engine;
 import com.gamesbykevin.tetris.menu.CustomMenu;
+import com.gamesbykevin.tetris.resources.GameAudio;
 import com.gamesbykevin.tetris.shared.IElement;
 import com.gamesbykevin.tetris.shared.Shared;
 
@@ -58,6 +59,9 @@ public final class Players implements Disposable, IElement
     private static final long LINE_DROP_DELAY_MEDIUM    = Timers.toNanoSeconds(333L);
     private static final long LINE_DROP_DELAY_HARD      = Timers.toNanoSeconds(100L);
     private static final long LINE_DROP_DELAY_VERY_HARD = Timers.toNanoSeconds(75L);
+    
+    //is the game complete
+    private boolean complete = false;
     
     public Players(final boolean multiple, final int modeIndex, final int difficultyIndex, final Font font) throws Exception
     {
@@ -123,6 +127,24 @@ public final class Players implements Disposable, IElement
             human.getStats().setFont(font);
             add(human);
         }
+    }
+    
+    /**
+     * Is the game complete
+     * @param complete true = yes, false = no
+     */
+    public void setComplete(final boolean complete)
+    {
+        this.complete = complete;
+    }
+    
+    /**
+     * Is the game finished?
+     * @return true = yes, false = no
+     */
+    public boolean isComplete()
+    {
+        return this.complete;
     }
     
     /**
@@ -212,6 +234,126 @@ public final class Players implements Disposable, IElement
         this.players.add(player);
     }
     
+    /**
+     * Check if the game has ended and determine the winner
+     */
+    private void checkGameover() throws Exception
+    {
+        for (int i = 0; i < players.size(); i++)
+        {
+            //get the current player
+            Player player = players.get(i);
+            
+            switch (player.getModeIndex())
+            {
+                case CustomMenu.GAME_MODE_INFINITE:
+                    
+                    //if the board is filled
+                    if (player.hasGameover())
+                    {
+                        //if infinite mode, we just reset
+                        player.reset();
+                    }
+                    break;
+                    
+                case CustomMenu.GAME_MODE_NORMAL:
+                    
+                    //if board has crashed
+                    if (player.hasGameover())
+                    {
+                        //create win image
+                        player.getStats().renderResultImage(false);
+                        
+                        //mark game as finished
+                        setComplete(true);
+                    }
+                    break;
+                    
+                case CustomMenu.GAME_MODE_TIMED:
+                    
+                    //check if the player crashed the board
+                    if (player.hasGameover())
+                    {
+                        //get the opponent, 
+                        Player opponent = (player.isHuman()) ? getCpu() : getHuman();
+                        
+                        //we lose because we crashed the board
+                        player.getStats().renderResultImage(false);
+
+                        //they win
+                        opponent.getStats().renderResultImage(true);
+                        
+                        //mark game completed
+                        setComplete(true);
+                        
+                        //exit method
+                        return;
+                    }
+                    else if (player.getStats().getGameTimer().hasTimePassed())
+                    {
+                        //get the opponent
+                        Player opponent = (player.isHuman()) ? getCpu() : getHuman();
+                        
+                        //if the player has more lines than opponent
+                        if (player.getBoard().getLines() > opponent.getBoard().getLines())
+                        {
+                            //we win
+                            player.getStats().renderResultImage(true);
+                            
+                            //opponent loses
+                            opponent.getStats().renderResultImage(false);
+                            
+                            //flag as lose
+                            opponent.setGameover(true);
+                        }
+                        else
+                        {
+                            //flag player as game over
+                            player.setGameover(true);
+                            
+                            //we lose
+                            player.getStats().renderResultImage(false);
+                            
+                            //opponent wins
+                            opponent.getStats().renderResultImage(true);
+                        }
+                        
+                        //mark game as finished
+                        setComplete(true);
+                        
+                        //exit method
+                        return;
+                    }
+                    break;
+                    
+                case CustomMenu.GAME_MODE_TUG_OF_WAR:
+                    
+                    //check if the player crashed the board, or no longer has health
+                    if (player.hasGameover() || player.getStats().getHealth() <= 0)
+                    {
+                        //flag player as game over
+                        player.setGameover(true);
+                        
+                        //get the opponent, 
+                        Player opponent = (player.isHuman()) ? getCpu() : getHuman();
+                        
+                        //we lose because we crashed the board
+                        player.getStats().renderResultImage(false);
+
+                        //they win
+                        opponent.getStats().renderResultImage(true);
+                        
+                        //mark game completed
+                        setComplete(true);
+                        
+                        //exit method
+                        return;
+                    }
+                    break;
+            }
+        }
+    }
+    
     @Override
     public void dispose()
     {
@@ -228,85 +370,99 @@ public final class Players implements Disposable, IElement
     @Override
     public void update(final Engine engine) throws Exception
     {
+        //if the game has completed, no need to continue
+        if (isComplete())
+            return;
+
+        //check if the game is over depending on game mode
+        checkGameover();
+        
+        //if the game is over play sound effect
+        if (isComplete())
+        {
+            //stop all sound
+            engine.getResources().stopAllSound();
+            
+            if (getHuman().hasGameover())
+            {
+                engine.getResources().playGameAudio(GameAudio.Keys.Lose);
+            }
+            else
+            {
+                engine.getResources().playGameAudio(GameAudio.Keys.Win);
+            }
+            
+            //game is over, don't continue
+            return;
+        }        
+        
         for (int i = 0; i < players.size(); i++)
         {
             //get the current player
             Player player = players.get(i);
             
-            //skip player if the game is over
-            if (!player.hasGameover())
+            //skip if this player has a crashed board
+            if (player.hasGameover())
+                continue;
+            
+            //if  there is a completed line, only update basic
+            if (player.getBoard().hasComplete())
             {
-                //if  there is a completed line, only update basic
-                if (player.getBoard().hasComplete())
+                //get the number of completed lines
+                final int lines = player.getBoard().getCompletedRowCount();
+
+                //update the basic elements
+                player.updateBasic(engine);
+
+                //if the finished line is complete
+                if (!player.getBoard().hasComplete())
                 {
-                    //get the number of completed lines
-                    final int lines = player.getBoard().getCompletedRowCount();
-                    
-                    //update the basic elements
-                    player.updateBasic(engine);
-                    
-                    //if the finished line is complete
-                    if (!player.getBoard().hasComplete())
+                    //only speed up the piece drop rate for the human
+                    if (player.isHuman())
                     {
-                        //only speed up the piece drop rate for the human
-                        if (player.isHuman())
-                        {
-                            //calculate the current level
-                            int level = (int)(player.getBoard().getLines() / LINES_PER_LEVEL);
+                        //calculate the current level
+                        int level = (int)(player.getBoard().getLines() / LINES_PER_LEVEL);
 
-                            //cap the level so the pieces can only drop so fast
-                            if (level > LEVEL_SPEED_UP_LIMIT)
-                                level = LEVEL_SPEED_UP_LIMIT;
+                        //cap the level so the pieces can only drop so fast
+                        if (level > LEVEL_SPEED_UP_LIMIT)
+                            level = LEVEL_SPEED_UP_LIMIT;
 
-                            //update drop piece timer according to level
-                            final long reset = (long)(Player.DEFAULT_PIECE_DROP_DELAY - (Player.DEFAULT_PIECE_DROP_DELAY * (SPEED_INCREASE_RATIO * level)));
+                        //update drop piece timer according to level
+                        final long reset = (long)(Player.DEFAULT_PIECE_DROP_DELAY - (Player.DEFAULT_PIECE_DROP_DELAY * (SPEED_INCREASE_RATIO * level)));
 
-                            //set new reset time and reset timer
-                            player.getTimer().setReset(reset);
-                            player.getTimer().reset();
-                        }
-                        
-                        switch (player.getModeIndex())
-                        {
-                            //if infinite mode, reward/penalize
-                            case CustomMenu.GAME_MODE_TUG_OF_WAR:
-
-                                //update the players health
-                                player.getStats().updateHealth(lines * TUG_OF_WAR_REWARD);
-                                player.getStats().renderHealthImage();
-
-                                if (player.isHuman())
-                                {
-                                    //penalize the other player
-                                    getCpu().getStats().updateHealth(lines * TUG_OF_WAR_PENALTY);
-                                    getCpu().getStats().renderHealthImage();
-                                }
-                                else
-                                {
-                                    //penalize the other player
-                                    getHuman().getStats().updateHealth(lines * TUG_OF_WAR_PENALTY);
-                                    getHuman().getStats().renderHealthImage();
-                                }
-                                break;
-                        }
+                        //set new reset time and reset timer
+                        player.getTimer().setReset(reset);
+                        player.getTimer().reset();
                     }
-                }
-                else
-                {
-                    player.update(engine);
+
+                    switch (player.getModeIndex())
+                    {
+                        //if infinite mode, reward/penalize
+                        case CustomMenu.GAME_MODE_TUG_OF_WAR:
+
+                            //update the players health
+                            player.getStats().updateHealth(lines * TUG_OF_WAR_REWARD);
+                            player.getStats().renderHealthImage();
+
+                            if (player.isHuman())
+                            {
+                                //penalize the other player
+                                getCpu().getStats().updateHealth(lines * TUG_OF_WAR_PENALTY);
+                                getCpu().getStats().renderHealthImage();
+                            }
+                            else
+                            {
+                                //penalize the other player
+                                getHuman().getStats().updateHealth(lines * TUG_OF_WAR_PENALTY);
+                                getHuman().getStats().renderHealthImage();
+                            }
+                            break;
+                    }
                 }
             }
             else
             {
-                switch (player.getModeIndex())
-                {
-                    //if infinite mode, we just reset the board
-                    case CustomMenu.GAME_MODE_INFINITE:
-                        player.reset();
-                        break;
-                }
-                
-                
+                player.update(engine);
             }
         }
     }

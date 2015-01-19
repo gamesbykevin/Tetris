@@ -177,19 +177,18 @@ public final class Engine implements KeyListener, MouseMotionListener, MouseList
     }
     
     /**
-     * Flag the engine to reset the game
+     * Reset keyboard and mouse input.<br>
+     * Stop any existing sound from playing.<br>
+     * Remove our manager object as null
      */
-    public void setReset()
+    public void markReset()
     {
         //reset mouse and keyboard input
         resetInput();
         
+        //if our resources object exists, stop any existing sound from playing
         if (this.resources != null)
-        {
             this.resources.stopAllSound();
-            this.resources.dispose();
-            this.resources = null;
-        }
         
         if (this.manager != null)
         {

@@ -342,7 +342,7 @@ public abstract class Player extends Sprite implements Disposable, IElement
     
     /**
      * Is the game over for this player?
-     * @return true if the board is filled with blocks, false otherwise
+     * @return true if the board is filled too high with blocks, false otherwise
      */
     protected boolean hasGameover()
     {
@@ -351,7 +351,7 @@ public abstract class Player extends Sprite implements Disposable, IElement
     
     /**
      * Flag the game finished (or not)
-     * @param gameover Has the board has been filled with blocks?
+     * @param gameover true if the game is over, false otherwise
      */
     protected void setGameover(final boolean gameover)
     {

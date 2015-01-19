@@ -32,7 +32,7 @@ public final class CustomMenu extends Menu implements IElement
     public enum OptionKey 
     {
         Sound, FullScreen, 
-        Render, Mode, Difficulty
+        Render, Mode, Difficulty, Music
     }
     
     /**
@@ -78,6 +78,15 @@ public final class CustomMenu extends Menu implements IElement
     public static final int GAME_DIFFICULTY_MEDIUM = 2;
     public static final int GAME_DIFFICULTY_HARD = 3;
     public static final int GAME_DIFFICULTY_VERY_HARD = 4;
+    
+    //options for different music to play
+    public static final int GAME_MUSIC_1 = 0;
+    public static final int GAME_MUSIC_2 = 1;
+    public static final int GAME_MUSIC_3 = 2;
+    public static final int GAME_MUSIC_4 = 3;
+    public static final int GAME_MUSIC_5 = 4;
+    public static final int GAME_MUSIC_6 = 5;
+    public static final int GAME_MUSIC_OFF = 6;
     
     //here the images for the mouse cursor will be contained
     private ImageManager images;
@@ -343,7 +352,7 @@ public final class CustomMenu extends Menu implements IElement
             if (super.hasCurrent(LayerKey.ExitGameConfirmed))
             {
                 //recycle game related objects
-                engine.setReset();
+                engine.markReset();
                 
                 //go to specified layer
                 super.setLayer(LayerKey.MainTitle);
@@ -354,7 +363,7 @@ public final class CustomMenu extends Menu implements IElement
             {
                 //if we previously weren't in this layer reset the game
                 if (!optionsInGame)
-                    engine.setReset();
+                    engine.markReset();
             }
         }
         else

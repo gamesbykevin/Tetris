@@ -53,10 +53,10 @@
         <options name="Mode: " id="Mode">
             <option>Normal</option>
             <option>Infinite</option>
-            <option>Timed "Versus"</option>
-            <option>Tug of War "Versus"</option>
+            <option>Timed "vs Cpu"</option>
+            <option>Tug of War "vs Cpu"</option>
         </options>
-        <options name="Difficulty: " id="Difficulty">
+        <options name="Cpu Difficulty: " id="Difficulty">
             <option>Very Easy</option>
             <option>Easy</option>
             <option>Medium</option>
@@ -66,6 +66,15 @@
         <options name="Render: " id="Render">
             <option>2 Dimensional</option>
             <option>Isometric</option>
+        </options>
+        <options name="Music: " id="Music">
+            <option>Song 1</option>
+            <option>Song 2</option>
+            <option>Song 3</option>
+            <option>Song 4</option>
+            <option>Song 5</option>
+            <option>Song 6</option>
+            <option>Off</option>
         </options>
         <options name="Sound: " id="Sound">
             <option>On</option>

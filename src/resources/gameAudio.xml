@@ -5,12 +5,14 @@
     <sound id="Place">resources/audio/game/sfx/place.wav</sound>
     <sound id="Rotate">resources/audio/game/sfx/rotate.wav</sound>
     
+    <sound id="Win">resources/audio/game/sfx/win.wav</sound>
+    <sound id="Lose">resources/audio/game/sfx/lose.wav</sound>
+    <sound id="Countdown">resources/audio/game/sfx/countdown.wav</sound>
+    
     <sound id="Music1">resources/audio/game/music/music1.mid</sound>
     <sound id="Music2">resources/audio/game/music/music2.mid</sound>
     <sound id="Music3">resources/audio/game/music/music3.mid</sound>
     <sound id="Music4">resources/audio/game/music/music4.mid</sound>
     <sound id="Music5">resources/audio/game/music/music5.mid</sound>
     <sound id="Music6">resources/audio/game/music/music6.mid</sound>
-    <sound id="Music7">resources/audio/game/music/music7.mid</sound>
-    <sound id="Music8">resources/audio/game/music/music8.mid</sound>
 </sounds>

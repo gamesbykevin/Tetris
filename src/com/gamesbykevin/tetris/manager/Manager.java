@@ -8,6 +8,7 @@ import com.gamesbykevin.tetris.engine.Engine;
 import com.gamesbykevin.tetris.menu.CustomMenu;
 import com.gamesbykevin.tetris.menu.CustomMenu.*;
 import com.gamesbykevin.tetris.player.*;
+import com.gamesbykevin.tetris.resources.GameAudio;
 import com.gamesbykevin.tetris.resources.GameFont;
 import com.gamesbykevin.tetris.resources.GameImages;
 
@@ -105,13 +106,47 @@ public final class Manager implements IManager
                 options.add(GameImages.Keys.Background2);
                 options.add(GameImages.Keys.Background3);
                 options.add(GameImages.Keys.Background4);
-                
             }
             
             //pick random position
             final int index = engine.getRandom().nextInt(options.size());
             
+            //set the background image to be displayed
             background = engine.getResources().getGameImage(options.get(index));
+            
+            switch (engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Music))
+            {
+                case CustomMenu.GAME_MUSIC_1:
+                    engine.getResources().playGameAudio(GameAudio.Keys.Music1, true);
+                    break;
+                    
+                case CustomMenu.GAME_MUSIC_2:
+                    engine.getResources().playGameAudio(GameAudio.Keys.Music2, true);
+                    break;
+                    
+                case CustomMenu.GAME_MUSIC_3:
+                    engine.getResources().playGameAudio(GameAudio.Keys.Music3, true);
+                    break;
+                    
+                case CustomMenu.GAME_MUSIC_4:
+                    engine.getResources().playGameAudio(GameAudio.Keys.Music4, true);
+                    break;
+                    
+                case CustomMenu.GAME_MUSIC_5:
+                    engine.getResources().playGameAudio(GameAudio.Keys.Music5, true);
+                    break;
+                    
+                case CustomMenu.GAME_MUSIC_6:
+                    engine.getResources().playGameAudio(GameAudio.Keys.Music6, true);
+                    break;
+                    
+                case CustomMenu.GAME_MUSIC_OFF:
+                    //don't play anything
+                    break;
+                    
+                default:
+                    throw new Exception("Music option not setup here = " + engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Music));
+            }
         }
         else
         {
@@ -149,6 +184,12 @@ public final class Manager implements IManager
         {
             players.dispose();
             players = null;
+        }
+        
+        if (background != null)
+        {
+            background.flush();
+            background = null;
         }
         
         try

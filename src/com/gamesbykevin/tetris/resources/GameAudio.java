@@ -18,8 +18,9 @@ public final class GameAudio extends AudioManager
     {
         Clear, Move, Place, Rotate,
         
-        Music1, Music2, Music3, Music4,
-        Music5, Music6, Music7, Music8,
+        Music1, Music2, Music3, Music4, Music5, Music6, 
+        
+        Win, Lose, Countdown
     }
     
     public GameAudio() throws Exception
