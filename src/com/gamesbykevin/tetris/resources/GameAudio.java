@@ -16,10 +16,10 @@ public final class GameAudio extends AudioManager
      */
     public enum Keys
     {
-        Clear, Move, Place, Rotate
-        /*
-        Engine, EngineLoop, Lap, EngineSlow, Horn, Turn, 
-        */
+        Clear, Move, Place, Rotate,
+        
+        Music1, Music2, Music3, Music4,
+        Music5, Music6, Music7, Music8,
     }
     
     public GameAudio() throws Exception

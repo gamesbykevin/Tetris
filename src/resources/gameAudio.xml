@@ -1,20 +1,16 @@
 <?xml version="1.0"?>
 <sounds>
-    <sound id="Clear">resources/audio/game/clear.wav</sound>
-    <sound id="Move">resources/audio/game/move.wav</sound>
-    <sound id="Place">resources/audio/game/place.wav</sound>
-    <sound id="Rotate">resources/audio/game/rotate.wav</sound>
-    <!--
-    <sound id="MusicTheme">resources/audio/game/music/Theme.mp3</sound>
-    <sound id="Engine">resources/audio/game/engine.wav</sound>
-    <sound id="EngineLoop">resources/audio/game/engineLoop.wav</sound>
-    <sound id="Lap">resources/audio/game/lap.wav</sound>
-    <sound id="EngineSlow">resources/audio/game/engineSlow.wav</sound>
-    <sound id="Horn">resources/audio/game/horn.wav</sound>
-    <sound id="Turn">resources/audio/game/turn.wav</sound>
-    <sound id="RaceStart">resources/audio/game/raceStart.mp3</sound>
-    <sound id="RaceFinish">resources/audio/game/raceFinish.mp3</sound>
-    <sound id="RaceWin">resources/audio/game/raceWin.mp3</sound>
-    <sound id="RaceLose">resources/audio/game/raceLose.mp3</sound>
-    -->
+    <sound id="Clear">resources/audio/game/sfx/clear.wav</sound>
+    <sound id="Move">resources/audio/game/sfx/move.wav</sound>
+    <sound id="Place">resources/audio/game/sfx/place.wav</sound>
+    <sound id="Rotate">resources/audio/game/sfx/rotate.wav</sound>
+    
+    <sound id="Music1">resources/audio/game/music/music1.mid</sound>
+    <sound id="Music2">resources/audio/game/music/music2.mid</sound>
+    <sound id="Music3">resources/audio/game/music/music3.mid</sound>
+    <sound id="Music4">resources/audio/game/music/music4.mid</sound>
+    <sound id="Music5">resources/audio/game/music/music5.mid</sound>
+    <sound id="Music6">resources/audio/game/music/music6.mid</sound>
+    <sound id="Music7">resources/audio/game/music/music7.mid</sound>
+    <sound id="Music8">resources/audio/game/music/music8.mid</sound>
 </sounds>
