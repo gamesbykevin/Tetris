@@ -9,6 +9,7 @@ import com.gamesbykevin.tetris.board.Board;
 import com.gamesbykevin.tetris.board.piece.Block;
 import com.gamesbykevin.tetris.board.piece.Piece;
 import com.gamesbykevin.tetris.engine.Engine;
+import com.gamesbykevin.tetris.menu.CustomMenu;
 import com.gamesbykevin.tetris.resources.GameAudio;
 import com.gamesbykevin.tetris.shared.IElement;
 
@@ -44,8 +45,8 @@ public abstract class Player extends Sprite implements Disposable, IElement
     //is the game finished for the player (meaning the board crashed)
     private boolean gameover = false;
     
-    //do we render isometric
-    private boolean isometric = false;
+    //the desired rendering for this player
+    private int renderIndex = 0;
     
     //the game game we are playing
     private final int modeIndex;
@@ -136,21 +137,21 @@ public abstract class Player extends Sprite implements Disposable, IElement
     }
     
     /**
-     * Set the render to isometric
-     * @param isometric true - isometric, false - 2d
+     * Set the render index
+     * @param renderIndex The type of render we will perform
      */
-    protected void setIsometric(final boolean isometric)
+    protected void setRenderIndex(final int renderIndex)
     {
-        this.isometric = isometric;
+        this.renderIndex = renderIndex;
     }
     
     /**
-     * Do we render the board isometric
-     * @return true - isometric, false - 2d
+     * Get the desired render
+     * @return index containing the desired render 
      */
-    protected boolean hasIsometric()
+    protected int getRenderIndex()
     {
-        return this.isometric;
+        return this.renderIndex;
     }
     
     /**
@@ -438,7 +439,7 @@ public abstract class Player extends Sprite implements Disposable, IElement
                             getBoard().addPiece(getPiece());
 
                             //draw board
-                            getBoard().render(graphics, hasIsometric());
+                            getBoard().render(graphics, getRenderIndex());
 
                             //now remove the piece
                             getBoard().removePiece(getPiece());
@@ -446,7 +447,7 @@ public abstract class Player extends Sprite implements Disposable, IElement
                         else
                         {
                             //draw board
-                            getBoard().render(graphics, hasIsometric());
+                            getBoard().render(graphics, getRenderIndex());
                         }
                     }
                     catch (Exception e)
@@ -457,13 +458,13 @@ public abstract class Player extends Sprite implements Disposable, IElement
                 else
                 {
                     //draw board
-                    getBoard().render(graphics, hasIsometric());
+                    getBoard().render(graphics, getRenderIndex());
                 }
             }
             else
             {
                 //draw board
-                getBoard().render(graphics, hasIsometric());
+                getBoard().render(graphics, getRenderIndex());
             }
         }
         
@@ -472,21 +473,30 @@ public abstract class Player extends Sprite implements Disposable, IElement
             double x;
             double y;
             
-            if (hasIsometric())
+            switch (getRenderIndex())
             {
-                //calculate the isometric coordinates where render should start
-                x = getBoard().getX() + Block.getIsometricX(getNextPiece());
-                y = getBoard().getY() + Block.getIsometricY(getNextPiece());
-            }
-            else
-            {
-                //calculate the 2d coordinates where the render should start
-                x = (int)(getBoard().getX() + (getNextPiece().getCol() * Block.WIDTH));
-                y = (int)(getBoard().getY() + (getNextPiece().getRow() * Block.HEIGHT));
+                case CustomMenu.RENDER_2D:
+                default:
+                    //calculate the 2d coordinates where the render should start
+                    x = (int)(getBoard().getX() + (getNextPiece().getCol() * Block.WIDTH));
+                    y = (int)(getBoard().getY() + (getNextPiece().getRow() * Block.HEIGHT));
+                    break;
+                    
+                case CustomMenu.RENDER_ISOMETRIC_1:
+                    //calculate the isometric coordinates where render should start
+                    x = getBoard().getX() + Block.getIsometric1X(getNextPiece());
+                    y = getBoard().getY() + Block.getIsometric1Y(getNextPiece());
+                    break;
+                    
+                case CustomMenu.RENDER_ISOMETRIC_2:
+                    //calculate the isometric coordinates where render should start
+                    x = getBoard().getX() + Block.getIsometric2X(getNextPiece());
+                    y = getBoard().getY() + Block.getIsometric2Y(getNextPiece());
+                    break;
             }
             
             //render the piece
-            getNextPiece().render(graphics, x, y, hasIsometric());
+            getNextPiece().render(graphics, x, y, getRenderIndex());
         }
         
         if (getStats() != null)

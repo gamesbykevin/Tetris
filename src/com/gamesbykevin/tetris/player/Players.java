@@ -148,42 +148,37 @@ public final class Players implements Disposable, IElement
     }
     
     /**
-     * Set the render for our players, all will be same
-     * @param isometric If true blocks will be rendered isometric, false blocks will be rendered 2d
+     * Set the render selection for our players, all will be same
+     * @param renderIndex The desired render
+     * @throws Exception if the render type is not setup here
      */
-    public void setIsometric(final boolean isometric)
+    public void setRenderIndex(final int renderIndex) throws Exception
     {
         for (int i = 0; i < players.size(); i++)
         {
             Player player = players.get(i);
             
-            player.setIsometric(isometric);
+            player.setRenderIndex(renderIndex);
             
             //now position board according to render setting
-            if (isometric)
+            switch (renderIndex)
             {
-                player.getBoard().setLocation(player.getX() + PLAYER_START_X_ISO, player.getY() + PLAYER_START_Y_ISO);
-            }
-            else
-            {
-                player.getBoard().setLocation(player.getX() + PLAYER_START_X_2D, player.getY() + PLAYER_START_Y_2D);
+                case CustomMenu.RENDER_2D:
+                case CustomMenu.RENDER_ISOMETRIC_2:
+                    player.getBoard().setLocation(player.getX() + PLAYER_START_X_2D, player.getY() + PLAYER_START_Y_2D);
+                    break;
+                    
+                case CustomMenu.RENDER_ISOMETRIC_1:
+                    player.getBoard().setLocation(player.getX() + PLAYER_START_X_ISO, player.getY() + PLAYER_START_Y_ISO);
+                    break;
+                    
+                default:
+                    throw new Exception("Render index is not setup = " + renderIndex);
             }
             
             //update polygon coordinates
             player.getBoard().assignBackground();
         }
-    }
-    
-    /**
-     * Are the players rendering isometric?
-     * @return true - if the first player in List is rendering isometric, false - if not or if the List of players is empty
-     */
-    public boolean hasIsometric()
-    {
-        if (players.isEmpty())
-            return false;
-        
-        return players.get(0).hasIsometric();
     }
     
     /**

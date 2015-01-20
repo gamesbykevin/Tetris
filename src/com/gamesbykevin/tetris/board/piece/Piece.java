@@ -3,6 +3,7 @@ package com.gamesbykevin.tetris.board.piece;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 import com.gamesbykevin.tetris.board.Board;
+import com.gamesbykevin.tetris.menu.CustomMenu;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -164,7 +165,7 @@ public final class Piece extends Sprite implements Disposable
     
     /**
      * Is this piece between the minimum, maximum columns on the tetris board?
-     * @return True if all blocks that make the piece are within the min,max of the board
+     * @return True if all blocks that make the piece are within the min,max of the board. False otherwise
      */
     public boolean hasVerticalBounds()
     {
@@ -322,8 +323,9 @@ public final class Piece extends Sprite implements Disposable
     
     /**
      * Render the blocks (for isometric rendering)
+     * @param renderIndex Different rendering calls to order the blocks differently
      */
-    private void sortBlocks()
+    private void sortBlocks(final int renderIndex)
     {
         //were objects swapped
         boolean swapped = true;
@@ -342,15 +344,34 @@ public final class Piece extends Sprite implements Disposable
                 final Block block1 = getBlocks().get(i);
                 final Block block2 = getBlocks().get(i + 1);
                 
-                if (block1.getRow() > block2.getRow() || block1.getRow() >= block2.getRow() && block1.getCol() > block2.getCol())
+                switch (renderIndex)
                 {
-                    //swap objects
-                    getBlocks().set(i, block2);
-                    getBlocks().set(i + 1, block1);
-                    
-                    //flag that objects are swapped
-                    swapped = true;
+                    case CustomMenu.RENDER_2D:
+                    case CustomMenu.RENDER_ISOMETRIC_1:
+                        if (block1.getRow() > block2.getRow() || block1.getRow() >= block2.getRow() && block1.getCol() > block2.getCol())
+                        {
+                            //swap objects
+                            getBlocks().set(i, block2);
+                            getBlocks().set(i + 1, block1);
+
+                            //flag that objects are swapped
+                            swapped = true;
+                        }
+                        break;
+                        
+                    case CustomMenu.RENDER_ISOMETRIC_2:
+                        if (block1.getRow() < block2.getRow() || block1.getRow() <= block2.getRow() && block1.getCol() > block2.getCol())
+                        {
+                            //swap objects
+                            getBlocks().set(i, block2);
+                            getBlocks().set(i + 1, block1);
+
+                            //flag that objects are swapped
+                            swapped = true;
+                        }
+                        break;
                 }
+                
             }
         }
     }
@@ -360,11 +381,12 @@ public final class Piece extends Sprite implements Disposable
      * @param graphics Object used to draw image
      * @param x x-coordinate where piece starts
      * @param y y-coordinate where piece starts
+     * @param renderIndex How do we render the piece
      */
-    public void render(final Graphics graphics, final double x, final double y, final boolean isometric)
+    public void render(final Graphics graphics, final double x, final double y, final int renderIndex)
     {
         //sort the blocks
-        sortBlocks();
+        sortBlocks(renderIndex);
         
         //draw every block
         for (int i = 0; i < getBlocks().size(); i++)
@@ -375,23 +397,35 @@ public final class Piece extends Sprite implements Disposable
             final double startX;
             final double startY;
             
-            if (isometric)
+            switch (renderIndex)
             {
-                //isometric coordinates
-                startX = x + Block.getIsometricX(block);
-                startY = y + Block.getIsometricY(block);
-                
-                //draw block
-                block.renderIsometric(graphics, startX, startY);
-            }
-            else
-            {
-                //2d coordinates of this block
-                startX = x + (block.getCol() * Block.WIDTH);
-                startY = y + (block.getRow() * Block.HEIGHT);
-                
-                //draw block
-                block.render2d(graphics, (int)startX, (int)startY);
+                case CustomMenu.RENDER_2D:
+                    //2d coordinates of this block
+                    startX = x + (block.getCol() * Block.WIDTH);
+                    startY = y + (block.getRow() * Block.HEIGHT);
+
+                    //draw block
+                    block.render2d(graphics, (int)startX, (int)startY);
+                    break;
+                    
+                case CustomMenu.RENDER_ISOMETRIC_1:
+                    //isometric coordinates
+                    startX = x + Block.getIsometric1X(block);
+                    startY = y + Block.getIsometric1Y(block);
+
+                    //draw block
+                    block.renderIsometric1(graphics, startX, startY);
+                    break;
+                    
+                case CustomMenu.RENDER_ISOMETRIC_2:
+                    //isometric coordinates
+                    startX = x + Block.getIsometric2X(block);
+                    startY = y + Block.getIsometric2Y(block);
+
+                    //draw block
+                    block.renderIsometric2(graphics, startX, startY);
+                    break;
+                    
             }
         }
     }

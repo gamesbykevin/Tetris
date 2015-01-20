@@ -4,6 +4,7 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.resources.Disposable;
 
 import com.gamesbykevin.tetris.board.piece.*;
+import com.gamesbykevin.tetris.menu.CustomMenu;
 import java.awt.Color;
 
 import java.awt.Graphics;
@@ -36,8 +37,20 @@ public final class Board extends Sprite implements Disposable
     private int lines = 0;
     
     //the background of the board for 2d and isometric
-    private Polygon background2d, backgroundIso;
+    private Polygon background2d, backgroundIso1, backgroundIso2;
     
+    //the range for the board outline
+    private static final int ISOMETRIC1_MIN_COL = 0;
+    private static final int ISOMETRIC1_MAX_COL = Board.COLS;
+    private static final int ISOMETRIC1_MIN_ROW = -1;
+    private static final int ISOMETRIC1_MAX_ROW = Board.ROWS - 1;
+    
+    //the range for the board outline
+    private static final int ISOMETRIC2_MIN_COL = 1;
+    private static final int ISOMETRIC2_MAX_COL = Board.COLS + 1;
+    private static final int ISOMETRIC2_MIN_ROW = -2;
+    private static final int ISOMETRIC2_MAX_ROW = Board.ROWS - 3;
+
     public Board()
     {
         //create a new board
@@ -537,7 +550,8 @@ public final class Board extends Sprite implements Disposable
         
         board = null;
         background2d = null;
-        backgroundIso = null;
+        backgroundIso1 = null;
+        backgroundIso2= null;
     }
     
     /**
@@ -548,75 +562,125 @@ public final class Board extends Sprite implements Disposable
         if (this.background2d == null)
             this.background2d = new Polygon();
         
-        if (this.backgroundIso == null)
-            this.backgroundIso = new Polygon();
+        if (this.backgroundIso1 == null)
+            this.backgroundIso1 = new Polygon();
         
+        if (this.backgroundIso2 == null)
+            this.backgroundIso2 = new Polygon();
+        
+            //setup 2d background coordinates
             this.background2d.reset();
             this.background2d.addPoint((int)getX(), (int)getY());
             this.background2d.addPoint((int)(getX() + getWidth()), (int)getY());
             this.background2d.addPoint((int)(getX() + getWidth()), (int)(getY() + getHeight()));
             this.background2d.addPoint((int)getX(), (int)(getY() + getHeight()));
             
-            this.backgroundIso.reset();
-            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, -1)), (int)(getY() + Block.getIsometricY(0, -1)));
-            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(Board.COLS, 0)), (int)(getY() + Block.getIsometricY(Board.COLS, 0)));
-            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(Board.COLS, Board.ROWS - 1)), (int)(getY() + Block.getIsometricY(Board.COLS, Board.ROWS - 1)));
-            this.backgroundIso.addPoint((int)(getX() + Block.getIsometricX(0, Board.ROWS - 1)), (int)(getY() + Block.getIsometricY(0, Board.ROWS - 1)));
+            //setup isometric 1 coordinates
+            this.backgroundIso1.reset();
+            this.backgroundIso1.addPoint((int)(getX() + Block.getIsometric1X(ISOMETRIC1_MIN_COL, ISOMETRIC1_MIN_ROW)), (int)(getY() + Block.getIsometric1Y(ISOMETRIC1_MIN_COL, ISOMETRIC1_MIN_ROW)));
+            this.backgroundIso1.addPoint((int)(getX() + Block.getIsometric1X(ISOMETRIC1_MAX_COL, ISOMETRIC1_MIN_ROW)), (int)(getY() + Block.getIsometric1Y(ISOMETRIC1_MAX_COL, ISOMETRIC1_MIN_ROW)));
+            this.backgroundIso1.addPoint((int)(getX() + Block.getIsometric1X(ISOMETRIC1_MAX_COL, ISOMETRIC1_MAX_ROW)), (int)(getY() + Block.getIsometric1Y(ISOMETRIC1_MAX_COL, ISOMETRIC1_MAX_ROW)));
+            this.backgroundIso1.addPoint((int)(getX() + Block.getIsometric1X(ISOMETRIC1_MIN_COL, ISOMETRIC1_MAX_ROW)), (int)(getY() + Block.getIsometric1Y(ISOMETRIC1_MIN_COL, ISOMETRIC1_MAX_ROW)));
+            
+            //setup isometric 2 coordinates
+            this.backgroundIso2.reset();
+            this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MIN_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MIN_COL, ISOMETRIC2_MIN_ROW)));
+            this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MAX_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MAX_COL, ISOMETRIC2_MIN_ROW)));
+            this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MAX_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MAX_COL, ISOMETRIC2_MAX_ROW)));
+            this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MIN_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MIN_COL, ISOMETRIC2_MAX_ROW)));
     }
     
     /**
      * Draw the board
      * @param graphics Object used to draw board
-     * @param isometric Do we render the board isometric (true) or 2d (false)?
+     * @param renderIndex How do we render the board
      */
-    public void render(final Graphics graphics, final boolean isometric)
+    public void render(final Graphics graphics, final int renderIndex)
     {
-        //set background color
-        graphics.setColor(Color.BLACK);
-        
-        //fill the board outline
-        graphics.fillPolygon((isometric) ? backgroundIso : background2d);
-        
-        //set color of outline
-        graphics.setColor(Color.WHITE);
-        
-        //draw the board outline
-        graphics.drawPolygon((isometric) ? backgroundIso : background2d);
-        
-        //draw blocks
-        for (int row = 0; row < board.length; row++)
+        //render the board outline accordingly
+        switch (renderIndex)
         {
-            for (int col = 0; col < board[0].length; col++)
-            {
-                //only draw block if we have one
-                if (hasBlock(col, row))
+            case CustomMenu.RENDER_2D:
+                graphics.setColor(Color.BLACK);
+                graphics.fillPolygon(background2d);
+                graphics.setColor(Color.WHITE);
+                graphics.drawPolygon(background2d);
+                break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_1:
+                graphics.setColor(Color.BLACK);
+                graphics.fillPolygon(backgroundIso1);
+                graphics.setColor(Color.WHITE);
+                graphics.drawPolygon(backgroundIso1);
+                break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_2:
+                graphics.setColor(Color.BLACK);
+                graphics.fillPolygon(backgroundIso2);
+                graphics.setColor(Color.WHITE);
+                graphics.drawPolygon(backgroundIso2);
+                break;
+        }
+        
+        //render the board accordingly
+        switch (renderIndex)
+        {
+            case CustomMenu.RENDER_2D:
+                for (int col = 0; col < board[0].length; col++)
                 {
-                    final double drawX;
-                    final double drawY;
-                    
-                    if (isometric)
+                    for (int row = 0; row < board.length; row++)
                     {
-                        //isometric coordinates
-                        drawX = getX() + Block.getIsometricX(col, row);
-                        drawY = getY() + Block.getIsometricY(col, row);
-                        
-                        //drawX = getX() + (col * Block.WIDTH);
-                        //drawY = getY() + (row * Block.HEIGHT);
-                        
-                        //draw block
-                        getBlock(col, row).renderIsometric(graphics, (int)drawX, (int)drawY);
-                    }
-                    else
-                    {
-                        //calculate coordinates, 2d coordinates.
-                        drawX = getX() + (col * Block.WIDTH);
-                        drawY = getY() + (row * Block.HEIGHT);
-                        
-                        //draw block
-                        getBlock(col, row).render2d(graphics, (int)drawX, (int)drawY);
+                        //only draw a block if we have one
+                        if (hasBlock(col, row))
+                        {
+                            //calculate coordinates, 2d coordinates.
+                            int x = (int)(getX() + (col * Block.WIDTH));
+                            int y = (int)(getY() + (row * Block.HEIGHT));
+
+                            //draw block
+                            getBlock(col, row).render2d(graphics, x, y);
+                        }
                     }
                 }
-            }
+                break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_1:
+                for (int row = 0; row < board.length; row++)
+                {
+                    for (int col = 0; col < board[0].length; col++)
+                    {
+                        //only draw a block if we have one
+                        if (hasBlock(col, row))
+                        {
+                            //calculate coordinates for isometric
+                            int x = (int)(getX() + Block.getIsometric1X(col, row));
+                            int y = (int)(getY() + Block.getIsometric1Y(col, row));
+                            
+                            //draw block
+                            getBlock(col, row).renderIsometric1(graphics, x, y);
+                        }
+                    }
+                }
+                break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_2:
+                for (int col = 0; col < board[0].length; col++)
+                {
+                    for (int row = board.length - 1; row >= 0; row--)
+                    {
+                        //only draw a block if we have one
+                        if (hasBlock(col, row))
+                        {
+                            //calculate coordinates for isometric
+                            int x = (int)(getX() + Block.getIsometric2X(col));
+                            int y = (int)(getY() + Block.getIsometric2Y(col, row));
+                            
+                            //draw block
+                            getBlock(col, row).renderIsometric2(graphics, x, y);
+                        }
+                    }
+                }
+                break;
         }
     }
 }

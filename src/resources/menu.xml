@@ -72,7 +72,8 @@
         </options>
         <options name="Render: " id="Render">
             <option>2-D</option>
-            <option>Isometric</option>
+            <option>Isometric 1</option>
+            <option>Isometric 2</option>
         </options>
         <options name="Music: " id="Music">
             <option>Song 1</option>
@@ -131,7 +132,8 @@
         <options name="Resume" id="Resume" next="GameStart"></options>
         <options name="Render: " id="Render">
             <option>2D</option>
-            <option>Isometric</option>
+            <option>Isometric 1</option>
+            <option>Isometric 2</option>
         </options>
         <options name="All Sound: " id="Sound">
             <option>On</option>

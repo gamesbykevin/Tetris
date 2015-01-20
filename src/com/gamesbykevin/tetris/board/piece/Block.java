@@ -2,6 +2,7 @@ package com.gamesbykevin.tetris.board.piece;
 
 import com.gamesbykevin.framework.base.Cell;
 import com.gamesbykevin.framework.resources.Disposable;
+import com.gamesbykevin.tetris.menu.CustomMenu;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,6 +18,10 @@ public final class Block extends Cell implements Disposable
     //the dimensions of each block
     public static final int WIDTH = 20;
     public static final int HEIGHT = 20;
+    
+    //the dimensions of each block
+    public static final int ISOMETRIC_WIDTH = 30;
+    public static final int ISOMETRIC_HEIGHT = 30;
     
     //the color of the block
     private Color color;
@@ -77,35 +82,67 @@ public final class Block extends Cell implements Disposable
      * Assign polygon coordinates for isometric rendering
      * @param x x-coordinate
      * @param y y-coordinate
+     * @param renderIndex the type of rendering we are doing
      */
-    private void assignCoordinates(final int x, final int y)
+    private void assignCoordinates(final int x, final int y, final int renderIndex)
     {
         if (frontSide == null)
             frontSide = new Polygon();
-        
-        frontSide.reset();
-        frontSide.addPoint(x, y);
-        frontSide.addPoint(x + (WIDTH/2), y + (HEIGHT/2));
-        frontSide.addPoint(x + (WIDTH/2), y);
-        frontSide.addPoint(x, y - (HEIGHT/2));
-        
         if (rightSide == null)
             rightSide = new Polygon();
-        
-        rightSide.reset();
-        rightSide.addPoint(x + (WIDTH/2), y + (HEIGHT/2));
-        rightSide.addPoint(x + WIDTH, y);
-        rightSide.addPoint(x + WIDTH, y - (HEIGHT / 2));
-        rightSide.addPoint(x + (WIDTH/2), y);
-        
         if (topSide == null)
             topSide = new Polygon();
         
-        topSide.reset();
-        topSide.addPoint(x, y - (HEIGHT/2));
-        topSide.addPoint(x + (WIDTH/2), y);
-        topSide.addPoint(x + WIDTH, y - (HEIGHT/2));
-        topSide.addPoint(x + (WIDTH/2), y - HEIGHT);
+        switch (renderIndex)
+        {
+            case CustomMenu.RENDER_ISOMETRIC_1:
+                frontSide.reset();
+                frontSide.addPoint(x, y);
+                frontSide.addPoint(x + (WIDTH/2), y + (HEIGHT/2));
+                frontSide.addPoint(x + (WIDTH/2), y);
+                frontSide.addPoint(x, y - (HEIGHT/2));
+
+                rightSide.reset();
+                rightSide.addPoint(x + (WIDTH/2), y + (HEIGHT/2));
+                rightSide.addPoint(x + WIDTH, y);
+                rightSide.addPoint(x + WIDTH, y - (HEIGHT / 2));
+                rightSide.addPoint(x + (WIDTH/2), y);
+
+                topSide.reset();
+                topSide.addPoint(x, y - (HEIGHT/2));
+                topSide.addPoint(x + (WIDTH/2), y);
+                topSide.addPoint(x + WIDTH, y - (HEIGHT/2));
+                topSide.addPoint(x + (WIDTH/2), y - HEIGHT);
+                break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_2:
+                frontSide.reset();
+                frontSide.addPoint(x, y);
+                frontSide.addPoint(x + (ISOMETRIC_WIDTH/2), y + (ISOMETRIC_HEIGHT/2));
+                frontSide.addPoint(x + (ISOMETRIC_WIDTH/2), y);
+                frontSide.addPoint(x, y - (ISOMETRIC_HEIGHT/2));
+
+                rightSide.reset();
+                rightSide.addPoint(x + (ISOMETRIC_WIDTH/2), y + (ISOMETRIC_HEIGHT/2));
+                rightSide.addPoint(x + ISOMETRIC_WIDTH, y);
+                rightSide.addPoint(x + ISOMETRIC_WIDTH, y - (ISOMETRIC_HEIGHT / 2));
+                rightSide.addPoint(x + (ISOMETRIC_WIDTH/2), y);
+
+                topSide.reset();
+                topSide.addPoint(x, y - (ISOMETRIC_HEIGHT/2));
+                topSide.addPoint(x + (ISOMETRIC_WIDTH/2), y);
+                topSide.addPoint(x + ISOMETRIC_WIDTH, y - (ISOMETRIC_HEIGHT/2));
+                topSide.addPoint(x + (ISOMETRIC_WIDTH/2), y - ISOMETRIC_HEIGHT);
+                break;
+                
+            case CustomMenu.RENDER_2D:
+                frontSide.reset();
+                frontSide.addPoint(x, y);
+                frontSide.addPoint(x + WIDTH, y);
+                frontSide.addPoint(x + WIDTH, y + HEIGHT);
+                frontSide.addPoint(x, y + HEIGHT);
+                break;
+        }
     }
     
     @Override
@@ -119,9 +156,9 @@ public final class Block extends Cell implements Disposable
      * @param piece The piece containing the column, row location
      * @return y-coordinate
      */
-    public static int getIsometricY(final Piece piece)
+    public static int getIsometric1Y(final Piece piece)
     {
-        return getIsometricY(piece.getCol(), piece.getRow());
+        return getIsometric1Y(piece.getCol(), piece.getRow());
     }
     
     /**
@@ -129,9 +166,9 @@ public final class Block extends Cell implements Disposable
      * @param block The block containing the column, row location
      * @return y-coordinate
      */
-    public static int getIsometricY(final Block block)
+    public static int getIsometric1Y(final Block block)
     {
-        return getIsometricY(block.getCol(), block.getRow());
+        return getIsometric1Y(block.getCol(), block.getRow());
     }
     
     /**
@@ -140,7 +177,7 @@ public final class Block extends Cell implements Disposable
      * @param row The row location
      * @return y-coordinate
      */
-    public static int getIsometricY(final double col, final double row)
+    public static int getIsometric1Y(final double col, final double row)
     {
         return (int)((col + row) * (HEIGHT / 2));
     }
@@ -150,9 +187,9 @@ public final class Block extends Cell implements Disposable
      * @param piece The piece containing the column, row location
      * @return x-coordinate
      */
-    public static int getIsometricX(final Piece piece)
+    public static int getIsometric1X(final Piece piece)
     {
-        return getIsometricX(piece.getCol(), piece.getRow());
+        return getIsometric1X(piece.getCol(), piece.getRow());
     }
     
     /**
@@ -160,9 +197,9 @@ public final class Block extends Cell implements Disposable
      * @param block The block containing the column, row location
      * @return x-coordinate
      */
-    public static int getIsometricX(final Block block)
+    public static int getIsometric1X(final Block block)
     {
-        return getIsometricX(block.getCol(), block.getRow());
+        return getIsometric1X(block.getCol(), block.getRow());
     }
     
     /**
@@ -171,27 +208,153 @@ public final class Block extends Cell implements Disposable
      * @param row The row location
      * @return x-coordinate
      */
-    public static int getIsometricX(final double col, final double row)
+    public static int getIsometric1X(final double col, final double row)
     {
         return (int)((col - row) * (WIDTH / 2));
     }
     
-    public void renderIsometric(final Graphics graphics, final double x, final double y)
+    /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param piece The piece containing the column, row location
+     * @return y-coordinate
+     */
+    public static int getIsometric2Y(final Piece piece)
+    {
+        return getIsometric2Y(piece.getCol(), piece.getRow());
+    }
+    
+    /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param block The block containing the column, row location
+     * @return y-coordinate
+     */
+    public static int getIsometric2Y(final Block block)
+    {
+        return getIsometric2Y(block.getCol(), block.getRow());
+    }
+    
+    /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param col The column location
+     * @param row The row location
+     * @return y-coordinate
+     */
+    public static int getIsometric2Y(final double col, final double row)
+    {
+        return (int)((col + row) * (ISOMETRIC_HEIGHT/2));
+    }
+    
+    /**
+     * Calculate the x-coordinate for isometric rendering
+     * @param piece The piece containing the column location
+     * @return x-coordinate
+     */
+    public static int getIsometric2X(final Piece piece)
+    {
+        return getIsometric2X(piece.getCol());
+    }
+    
+    /**
+     * Calculate the x-coordinate for isometric rendering
+     * @param block The block containing the column location
+     * @return x-coordinate
+     */
+    public static int getIsometric2X(final Block block)
+    {
+        return getIsometric2X(block.getCol());
+    }
+    
+    /**
+     * Calculate the x-coordinate for isometric rendering
+     * @param col The column location
+     * @return x-coordinate
+     */
+    public static int getIsometric2X(final double col)
+    {
+        return (int)(col * (ISOMETRIC_WIDTH / 2));
+    }
+    
+    /**
+     * Draw an isometric cube.
+     * @param graphics Object used to draw shape
+     * @param x starting x-coordinate
+     * @param y starting y-coordinate
+     */
+    public void renderIsometric1(final Graphics graphics, final double x, final double y)
     {
         //assign polygon coordinates
-        assignCoordinates((int)x, (int)y);
+        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_ISOMETRIC_1);
         
-        //set block color and fill shape
-        graphics.setColor(getColor());
-        graphics.fillPolygon(topSide);
-        graphics.fillPolygon(rightSide);
-        graphics.fillPolygon(frontSide);
+        //render isometric block
+        render(graphics, CustomMenu.RENDER_ISOMETRIC_1);
+    }
+    
+    /**
+     * Draw an isometric cube.
+     * @param graphics Object used to draw shape
+     * @param x starting x-coordinate
+     * @param y starting y-coordinate
+     */
+    public void renderIsometric2(final Graphics graphics, final double x, final double y)
+    {
+        //assign polygon coordinates
+        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_ISOMETRIC_2);
         
-        //set outline color and draw outline
-        graphics.setColor(Color.WHITE);
-        graphics.drawPolygon(frontSide);
-        graphics.drawPolygon(rightSide);
-        graphics.drawPolygon(topSide);
+        //render isometric block
+        render(graphics, CustomMenu.RENDER_ISOMETRIC_2);
+    }
+    
+    /**
+     * Render polygon(s) here
+     * @param graphics Object used to draw block
+     * @param renderIndex The way we want to render our block
+     */
+    private void render(final Graphics graphics, final int renderIndex)
+    {
+        switch (renderIndex)
+        {
+            case CustomMenu.RENDER_ISOMETRIC_1:
+            case CustomMenu.RENDER_ISOMETRIC_2:
+                //set block color and fill shape
+                graphics.setColor(getColor());
+
+                if (topSide != null)
+                    graphics.fillPolygon(topSide);
+
+                if (rightSide != null)
+                    graphics.fillPolygon(rightSide);
+
+                if (frontSide != null)
+                    graphics.fillPolygon(frontSide);
+
+                //set outline color and draw outline
+                graphics.setColor(Color.WHITE);
+
+                if (frontSide != null)
+                    graphics.drawPolygon(frontSide);
+
+                if (rightSide != null)
+                    graphics.drawPolygon(rightSide);
+
+                if (topSide != null)
+                    graphics.drawPolygon(topSide);
+                break;
+                
+            case CustomMenu.RENDER_2D:
+                
+                //set block color and fill shape
+                graphics.setColor(getColor());
+                
+                if (frontSide != null)
+                    graphics.fillPolygon(frontSide);
+                
+                //set outline color and draw outline
+                graphics.setColor(Color.WHITE);
+                
+                if (frontSide != null)
+                    graphics.drawPolygon(frontSide);
+                break;
+        }
     }
     
     /**
@@ -203,16 +366,10 @@ public final class Block extends Cell implements Disposable
      */
     public void render2d(final Graphics graphics, final int x, final int y)
     {
-        //set block color
-        graphics.setColor(getColor());
+        //assign polygon coordinates
+        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_2D);
         
-        //fill the block
-        graphics.fillRect(x, y, WIDTH, HEIGHT);
-     
-        //set outline color
-        graphics.setColor(Color.WHITE);
-
-        //draw the outline
-        graphics.drawRect(x, y, WIDTH, HEIGHT);
+        //render isometric block
+        render(graphics, CustomMenu.RENDER_2D);
     }
 }

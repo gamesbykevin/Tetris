@@ -54,8 +54,8 @@ public final class CustomMenu extends Menu implements IElement
     //does the java container have focus
     private boolean focus = true;
     
-    //is isometric render mode enabled
-    private boolean isometric = false;
+    //store current render setting
+    private int renderIndex = 0;
     
     //values for sound
     public static final int SOUND_ENABLED = 0;
@@ -66,8 +66,9 @@ public final class CustomMenu extends Menu implements IElement
     public static final int FULLSCREEN_DISABLED = 0;
     
     //values for render
-    public static final int ISOMETRIC_ENABLED = 1;
-    public static final int ISOMETRIC_DISABLED = 0;
+    public static final int RENDER_2D = 0;
+    public static final int RENDER_ISOMETRIC_1 = 1;
+    public static final int RENDER_ISOMETRIC_2 = 2;
     
     //different game modes
     public static final int GAME_MODE_NORMAL = 0;
@@ -192,8 +193,14 @@ public final class CustomMenu extends Menu implements IElement
                     changeFullscreen = true;
                 
                 //check for a change
-                if (isometric != (getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Render) == ISOMETRIC_ENABLED))
+                if (renderIndex != (getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Render)))
+                {
+                    //flag change
                     changeRender = true;
+                    
+                    //store new selection
+                    renderIndex = getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Render);
+                }
             }
             else if (optionsMain)
             {
@@ -204,24 +211,27 @@ public final class CustomMenu extends Menu implements IElement
                     changeFullscreen = true;
                 
                 //make sure objects exist first
-                if (isometric != (getOptionSelectionIndex(LayerKey.Options, OptionKey.Render) == ISOMETRIC_ENABLED))
+                if (renderIndex != (getOptionSelectionIndex(LayerKey.Options, OptionKey.Render)))
+                {
+                    //flag change
                     changeRender = true;
+                    
+                    //store new selection
+                    renderIndex = getOptionSelectionIndex(LayerKey.Options, OptionKey.Render);
+                }
             }
             
             if (changeRender)
             {
-                //flip current setting
-                isometric = !isometric;
-                
                 //make sure players have been created first
                 if (engine.getManager() != null && engine.getManager().getPlayers() != null)
-                    engine.getManager().getPlayers().setIsometric(isometric);
+                    engine.getManager().getPlayers().setRenderIndex(renderIndex);
                 
                 //make sure other layer option setting matches current layer option
                 if (optionsInGame)
                 {
                     //set option in other layer to match
-                    getOption(LayerKey.Options, OptionKey.Render).setIndex((isometric) ? ISOMETRIC_ENABLED : ISOMETRIC_DISABLED);
+                    getOption(LayerKey.Options, OptionKey.Render).setIndex(renderIndex);
                     
                     //flag a new image to be drawn for that layer
                     getLayer(LayerKey.Options).resetOptionsImage();
@@ -229,7 +239,7 @@ public final class CustomMenu extends Menu implements IElement
                 else if (optionsMain)
                 {
                     //set option in other layer to match
-                    getOption(LayerKey.OptionsInGame, OptionKey.Render).setIndex((isometric) ? ISOMETRIC_ENABLED : ISOMETRIC_DISABLED);
+                    getOption(LayerKey.OptionsInGame, OptionKey.Render).setIndex(renderIndex);
                     
                     //flag a new image to be drawn for that layer
                     getLayer(LayerKey.OptionsInGame).resetOptionsImage();

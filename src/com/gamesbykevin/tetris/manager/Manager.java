@@ -83,11 +83,8 @@ public final class Manager implements IManager
             //create players
             players = new Players(multiple, modeIndex, engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Difficulty), engine.getResources().getGameFont(GameFont.Keys.Default));
             
-            //get the render setting
-            boolean isometric = engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Render) == CustomMenu.ISOMETRIC_ENABLED;
-            
             //set the render
-            players.setIsometric(isometric);
+            players.setRenderIndex(engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Render));
             
             //create new empty list
             List<GameImages.Keys> options = new ArrayList<>();
