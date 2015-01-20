@@ -83,7 +83,7 @@ public final class Players implements Disposable, IElement
             
             //create cpu opponent
             cpu = new Cpu(modeIndex);
-            cpu.setX(Shared.ORIGINAL_WIDTH / 2);
+            cpu.setX((Shared.ORIGINAL_WIDTH / 2) - 10);
             cpu.setY(PLAYER_START_Y);
             cpu.getStats().setFont(font);
             

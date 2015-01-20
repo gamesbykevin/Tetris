@@ -401,41 +401,29 @@ public final class Piece extends Sprite implements Disposable
             switch (renderIndex)
             {
                 case CustomMenu.RENDER_2D:
-                    //2d coordinates of this block
+                default:
                     startX = x + Block.get2dX(block);
                     startY = y + Block.get2dY(block);
-
-                    //draw block
-                    block.render2d(graphics, (int)startX, (int)startY);
                     break;
                     
                 case CustomMenu.RENDER_ISOMETRIC_1:
-                    //isometric coordinates
                     startX = x + Block.getIsometric1X(block);
                     startY = y + Block.getIsometric1Y(block);
-
-                    //draw block
-                    block.renderIsometric1(graphics, startX, startY);
                     break;
                     
                 case CustomMenu.RENDER_ISOMETRIC_2:
-                    //isometric coordinates
                     startX = x + Block.getIsometric2X(block);
                     startY = y + Block.getIsometric2Y(block);
-
-                    //draw block
-                    block.renderIsometric2(graphics, startX, startY);
                     break;
                     
                 case CustomMenu.RENDER_ISOMETRIC_3:
-                    //isometric coordinates
                     startX = x + Block.getIsometric3X(block);
                     startY = y + Block.getIsometric3Y(block);
-
-                    //draw block
-                    block.renderIsometric3(graphics, startX, startY);
                     break;
             }
+            
+            //draw block
+            block.render(graphics, startX, startY, renderIndex);
         }
     }
 }

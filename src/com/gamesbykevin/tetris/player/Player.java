@@ -424,6 +424,11 @@ public abstract class Player extends Sprite implements Disposable, IElement
     @Override
     public void render(final Graphics graphics)
     {
+        if (getStats() != null)
+        {
+            getStats().render(graphics);
+        }
+        
         if (getBoard() != null)
         {
             //only draw the current piece if no lines have been completed
@@ -497,11 +502,6 @@ public abstract class Player extends Sprite implements Disposable, IElement
             
             //render the piece
             getNextPiece().render(graphics, x, y, getRenderIndex());
-        }
-        
-        if (getStats() != null)
-        {
-            getStats().render(graphics);
         }
     }
 }

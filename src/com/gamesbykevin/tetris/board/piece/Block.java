@@ -396,57 +396,17 @@ public final class Block extends Cell implements Disposable
     }
     
     /**
-     * Draw an isometric cube.
-     * @param graphics Object used to draw shape
-     * @param x starting x-coordinate
-     * @param y starting y-coordinate
-     */
-    public void renderIsometric1(final Graphics graphics, final double x, final double y)
-    {
-        //assign polygon coordinates
-        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_ISOMETRIC_1);
-        
-        //render isometric block
-        render(graphics, CustomMenu.RENDER_ISOMETRIC_1);
-    }
-    
-    /**
-     * Draw an isometric cube.
-     * @param graphics Object used to draw shape
-     * @param x starting x-coordinate
-     * @param y starting y-coordinate
-     */
-    public void renderIsometric2(final Graphics graphics, final double x, final double y)
-    {
-        //assign polygon coordinates
-        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_ISOMETRIC_2);
-        
-        //render isometric block
-        render(graphics, CustomMenu.RENDER_ISOMETRIC_2);
-    }
-    
-    /**
-     * Draw an isometric cube.
-     * @param graphics Object used to draw shape
-     * @param x starting x-coordinate
-     * @param y starting y-coordinate
-     */
-    public void renderIsometric3(final Graphics graphics, final double x, final double y)
-    {
-        //assign polygon coordinates
-        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_ISOMETRIC_3);
-        
-        //render isometric block
-        render(graphics, CustomMenu.RENDER_ISOMETRIC_3);
-    }
-    
-    /**
-     * Render polygon(s) here
+     * Render block
      * @param graphics Object used to draw block
+     * @param x starting x-coordinate
+     * @param y starting y-coordinate
      * @param renderIndex The way we want to render our block
      */
-    private void render(final Graphics graphics, final int renderIndex)
+    public void render(final Graphics graphics, final double x, final double y, final int renderIndex)
     {
+        //assign polygon coordinates
+        assignCoordinates((int)x, (int)y, renderIndex);
+        
         switch (renderIndex)
         {
             case CustomMenu.RENDER_ISOMETRIC_1:
@@ -492,21 +452,5 @@ public final class Block extends Cell implements Disposable
                     graphics.drawPolygon(frontSide);
                 break;
         }
-    }
-    
-    /**
-     * Draw the block
-     * @param graphics Object used to create image
-     * @param outline Do we draw the outline
-     * @param x Starting x-coordinate of location
-     * @param y Starting y-coordinate of location
-     */
-    public void render2d(final Graphics graphics, final int x, final int y)
-    {
-        //assign polygon coordinates
-        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_2D);
-        
-        //render isometric block
-        render(graphics, CustomMenu.RENDER_2D);
     }
 }

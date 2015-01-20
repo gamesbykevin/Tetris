@@ -662,7 +662,7 @@ public final class Board extends Sprite implements Disposable
                             int y = (int)(getY() + Block.get2dY(row));
 
                             //draw block
-                            getBlock(col, row).render2d(graphics, x, y);
+                            getBlock(col, row).render(graphics, x, y, renderIndex);
                         }
                     }
                 }
@@ -681,7 +681,7 @@ public final class Board extends Sprite implements Disposable
                             int y = (int)(getY() + Block.getIsometric1Y(col, row));
                             
                             //draw block
-                            getBlock(col, row).renderIsometric1(graphics, x, y);
+                            getBlock(col, row).render(graphics, x, y, renderIndex);
                         }
                     }
                 }
@@ -700,7 +700,7 @@ public final class Board extends Sprite implements Disposable
                             int y = (int)(getY() + Block.getIsometric2Y(col, row));
                             
                             //draw block
-                            getBlock(col, row).renderIsometric2(graphics, x, y);
+                            getBlock(col, row).render(graphics, x, y, renderIndex);
                         }
                     }
                 }
@@ -719,7 +719,7 @@ public final class Board extends Sprite implements Disposable
                             int y = (int)(getY() + Block.getIsometric3Y(col, row));
                             
                             //draw block
-                            getBlock(col, row).renderIsometric3(graphics, x, y);
+                            getBlock(col, row).render(graphics, x, y, renderIndex);
                         }
                     }
                 }

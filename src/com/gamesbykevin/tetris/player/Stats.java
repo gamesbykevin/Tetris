@@ -60,11 +60,12 @@ public final class Stats implements Disposable
     private static final int IMAGE_HEIGHT = 25;
     
     //the offset where the stats will be drawn
-    private static final int OFFSET_X = 230;
+    private static final int OFFSET_X = 235;
     private static final int OFFSET_Y = 225;
     
     //the pixels to offset each individual stat
-    private static final int OFFSET_STAT_X = 5;
+    private static final int OFFSET_STAT_X = 10;
+    private static final int OFFSET_STAT_Y = 2;
     
     //get player info at first
     private boolean setup = true;
@@ -196,7 +197,7 @@ public final class Stats implements Disposable
         
         //draw info
         g2d.setColor(Color.WHITE);
-        g2d.drawString("Level: " + level, OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+        g2d.drawString("Level: " + level, OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
     }
 
     /**
@@ -218,8 +219,8 @@ public final class Stats implements Disposable
         
         //draw info
         g2d.setColor((win) ? Color.GREEN : Color.RED);
-        g2d.drawString((win) ? "Winner" : "Loser", OFFSET_STAT_X, IMAGE_HEIGHT - 1);
-        g2d.drawString("Press \"esc\"", OFFSET_STAT_X, (IMAGE_HEIGHT * 2) - 1);
+        g2d.drawString((win) ? "Winner" : "Loser", OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
+        g2d.drawString("Press \"esc\"", OFFSET_STAT_X, (IMAGE_HEIGHT * 2) - OFFSET_STAT_Y);
     }
     
     /**
@@ -241,7 +242,7 @@ public final class Stats implements Disposable
         
         //draw info
         g2d.setColor(Color.WHITE);
-        g2d.drawString("" + name, OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+        g2d.drawString("" + name, OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
     }
     
     /**
@@ -263,7 +264,7 @@ public final class Stats implements Disposable
         
         //draw info
         g2d.setColor(Color.WHITE);
-        g2d.drawString("Lines: " + lines, OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+        g2d.drawString("Lines: " + lines, OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
     }
     
     /**
@@ -290,14 +291,14 @@ public final class Stats implements Disposable
             case CustomMenu.GAME_MODE_TIMED:
                 
                 //draw time remaining info
-                g2d.drawString("Time: " + getGameTimer().getDescRemaining(Timers.FORMAT_8), OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+                g2d.drawString("Time: " + getGameTimer().getDescRemaining(Timers.FORMAT_8), OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
                 break;
                 
             //everything else get time passed
             default:
                 
                 //draw time passed info
-                g2d.drawString("Time: " + getGameTimer().getDescPassed(Timers.FORMAT_8), OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+                g2d.drawString("Time: " + getGameTimer().getDescPassed(Timers.FORMAT_8), OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
                 break;
         }
     }
@@ -337,7 +338,7 @@ public final class Stats implements Disposable
             g2d.setColor(Color.GREEN);
         }
         
-        g2d.drawString("Health: " + health, OFFSET_STAT_X, IMAGE_HEIGHT - 1);
+        g2d.drawString("Health: " + health, OFFSET_STAT_X, IMAGE_HEIGHT - OFFSET_STAT_Y);
     }
     
     /**
