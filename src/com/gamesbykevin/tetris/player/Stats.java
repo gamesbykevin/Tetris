@@ -65,7 +65,7 @@ public final class Stats implements Disposable
     
     //the pixels to offset each individual stat
     private static final int OFFSET_STAT_X = 10;
-    private static final int OFFSET_STAT_Y = 2;
+    private static final int OFFSET_STAT_Y = 4;
     
     //get player info at first
     private boolean setup = true;
