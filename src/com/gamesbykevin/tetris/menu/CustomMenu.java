@@ -77,11 +77,11 @@ public final class CustomMenu extends Menu implements IElement
     public static final int GAME_MODE_TUG_OF_WAR = 3;
     
     //the different difficulty levels
-    public static final int GAME_DIFFICULTY_VERY_EASY = 0;
-    public static final int GAME_DIFFICULTY_EASY = 1;
-    public static final int GAME_DIFFICULTY_MEDIUM = 2;
-    public static final int GAME_DIFFICULTY_HARD = 3;
-    public static final int GAME_DIFFICULTY_VERY_HARD = 4;
+    public static final int GAME_DIFFICULTY_VERY_EASY = 3;
+    public static final int GAME_DIFFICULTY_EASY = 4;
+    public static final int GAME_DIFFICULTY_MEDIUM = 0;
+    public static final int GAME_DIFFICULTY_HARD = 1;
+    public static final int GAME_DIFFICULTY_VERY_HARD = 2;
     
     //options for different music to play
     public static final int GAME_MUSIC_1 = 0;

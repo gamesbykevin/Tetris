@@ -39,7 +39,7 @@ public final class Players implements Disposable, IElement
     
     //the reward/penalty (for tug of war mode)
     private static final int TUG_OF_WAR_REWARD = 1;
-    private static final int TUG_OF_WAR_PENALTY = -3;
+    private static final int TUG_OF_WAR_PENALTY = -4;
     
     //the maximum number of players allowed in the game
     private static final int PLAYER_LIMIT = 2;
@@ -54,11 +54,11 @@ public final class Players implements Disposable, IElement
     private static final int LEVEL_SPEED_UP_LIMIT = 15;
     
     //different delays for each difficulty
-    private static final long LINE_DROP_DELAY_VERY_EASY = Timers.toNanoSeconds(750L);
-    private static final long LINE_DROP_DELAY_EASY      = Timers.toNanoSeconds(600L);
-    private static final long LINE_DROP_DELAY_MEDIUM    = Timers.toNanoSeconds(333L);
-    private static final long LINE_DROP_DELAY_HARD      = Timers.toNanoSeconds(100L);
-    private static final long LINE_DROP_DELAY_VERY_HARD = Timers.toNanoSeconds(75L);
+    private static final long LINE_DROP_DELAY_VERY_EASY = Timers.toNanoSeconds(600L);
+    private static final long LINE_DROP_DELAY_EASY      = Timers.toNanoSeconds(333L);
+    private static final long LINE_DROP_DELAY_MEDIUM    = Timers.toNanoSeconds(100L);
+    private static final long LINE_DROP_DELAY_HARD      = Timers.toNanoSeconds(75L);
+    private static final long LINE_DROP_DELAY_VERY_HARD = Timers.toNanoSeconds(25L);
     
     //is the game complete
     private boolean complete = false;

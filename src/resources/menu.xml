@@ -64,11 +64,11 @@
             <option>Tug of War "vs Cpu"</option>
         </options>
         <options name="Cpu Difficulty: " id="Difficulty">
-            <option>Very Easy</option>
-            <option>Easy</option>
             <option>Medium</option>
             <option>Hard</option>
             <option>Very Hard</option>
+            <option>Very Easy</option>
+            <option>Easy</option>
         </options>
         <options name="Render: " id="Render">
             <option>2-D</option>
