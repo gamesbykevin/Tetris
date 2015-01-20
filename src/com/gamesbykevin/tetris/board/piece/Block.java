@@ -135,6 +135,26 @@ public final class Block extends Cell implements Disposable
                 topSide.addPoint(x + (ISOMETRIC_WIDTH/2), y - ISOMETRIC_HEIGHT);
                 break;
                 
+            case CustomMenu.RENDER_ISOMETRIC_3:
+                frontSide.reset();
+                frontSide.addPoint(x, y);
+                frontSide.addPoint(x + WIDTH, y + (int)(HEIGHT * .25));
+                frontSide.addPoint(x + WIDTH, y - (int)(HEIGHT * .75));
+                frontSide.addPoint(x, y - HEIGHT);
+                
+                rightSide.reset();
+                rightSide.addPoint(x + WIDTH, y + (int)(HEIGHT * .25));
+                rightSide.addPoint(x + WIDTH + (int)(WIDTH * .75), y);
+                rightSide.addPoint(x + WIDTH + (int)(WIDTH * .75), y - HEIGHT);
+                rightSide.addPoint(x + WIDTH, y - (int)(HEIGHT * .75));
+                
+                topSide.reset();
+                topSide.addPoint(x + WIDTH, y - (int)(HEIGHT * .75));
+                topSide.addPoint(x + WIDTH + (int)(WIDTH * .75), y - HEIGHT);
+                topSide.addPoint(x + WIDTH - (int)(WIDTH * .25), y - HEIGHT - (int)(HEIGHT * .25));
+                topSide.addPoint(x, y - HEIGHT);
+                break;
+                
             case CustomMenu.RENDER_2D:
                 frontSide.reset();
                 frontSide.addPoint(x, y);
@@ -149,6 +169,46 @@ public final class Block extends Cell implements Disposable
     public void dispose()
     {
         this.color = null;
+    }
+    
+    /**
+     * Calculate the x-coordinate for rendering
+     * @param block The block containing the location
+     * @return x-coordinate
+     */
+    public static int get2dX(final Block block)
+    {
+        return get2dX((int)block.getCol());
+    }
+    
+    /**
+     * Calculate the x-coordinate for rendering
+     * @param col The location of the column
+     * @return x-coordinate
+     */
+    public static int get2dX(final int col)
+    {
+        return (col * WIDTH);
+    }
+    
+    /**
+     * Calculate the y-coordinate for rendering
+     * @param block The block containing the location
+     * @return y-coordinate
+     */
+    public static int get2dY(final Block block)
+    {
+        return get2dY((int)block.getRow());
+    }
+    
+    /**
+     * Calculate the y-coordinate for rendering
+     * @param row The location of the row
+     * @return y-coordinate
+     */
+    public static int get2dY(final int row)
+    {
+        return (row * HEIGHT);
     }
     
     /**
@@ -234,17 +294,6 @@ public final class Block extends Cell implements Disposable
     }
     
     /**
-     * Calculate the y-coordinate for isometric rendering
-     * @param col The column location
-     * @param row The row location
-     * @return y-coordinate
-     */
-    public static int getIsometric2Y(final double col, final double row)
-    {
-        return (int)((col + row) * (ISOMETRIC_HEIGHT/2));
-    }
-    
-    /**
      * Calculate the x-coordinate for isometric rendering
      * @param piece The piece containing the column location
      * @return x-coordinate
@@ -265,6 +314,17 @@ public final class Block extends Cell implements Disposable
     }
     
     /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param col The column location
+     * @param row The row location
+     * @return y-coordinate
+     */
+    public static int getIsometric2Y(final double col, final double row)
+    {
+        return (int)((col + row) * (ISOMETRIC_HEIGHT/2));
+    }
+    
+    /**
      * Calculate the x-coordinate for isometric rendering
      * @param col The column location
      * @return x-coordinate
@@ -272,6 +332,67 @@ public final class Block extends Cell implements Disposable
     public static int getIsometric2X(final double col)
     {
         return (int)(col * (ISOMETRIC_WIDTH / 2));
+    }
+    
+    /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param piece The piece containing the column, row location
+     * @return y-coordinate
+     */
+    public static int getIsometric3Y(final Piece piece)
+    {
+        return getIsometric3Y(piece.getCol(), piece.getRow());
+    }
+    
+    /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param block The block containing the column, row location
+     * @return y-coordinate
+     */
+    public static int getIsometric3Y(final Block block)
+    {
+        return getIsometric3Y(block.getCol(), block.getRow());
+    }
+    
+    /**
+     * Calculate the x-coordinate for isometric rendering
+     * @param piece The piece containing the column location
+     * @return x-coordinate
+     */
+    public static int getIsometric3X(final Piece piece)
+    {
+        return getIsometric3X(piece.getCol());
+    }
+    
+    /**
+     * Calculate the x-coordinate for isometric rendering
+     * @param block The block containing the column location
+     * @return x-coordinate
+     */
+    public static int getIsometric3X(final Block block)
+    {
+        return getIsometric3X(block.getCol());
+    }
+    
+    /**
+     * Calculate the y-coordinate for isometric rendering
+     * @param col The column location
+     * @param row The row location
+     * @return y-coordinate
+     */
+    public static int getIsometric3Y(final double col, final double row)
+    {
+        return (int)((row * HEIGHT) + (col * (HEIGHT * .25)));
+    }
+    
+    /**
+     * Calculate the x-coordinate for isometric rendering
+     * @param col The column location
+     * @return x-coordinate
+     */
+    public static int getIsometric3X(final double col)
+    {
+        return (int)(col * HEIGHT);
     }
     
     /**
@@ -305,6 +426,21 @@ public final class Block extends Cell implements Disposable
     }
     
     /**
+     * Draw an isometric cube.
+     * @param graphics Object used to draw shape
+     * @param x starting x-coordinate
+     * @param y starting y-coordinate
+     */
+    public void renderIsometric3(final Graphics graphics, final double x, final double y)
+    {
+        //assign polygon coordinates
+        assignCoordinates((int)x, (int)y, CustomMenu.RENDER_ISOMETRIC_3);
+        
+        //render isometric block
+        render(graphics, CustomMenu.RENDER_ISOMETRIC_3);
+    }
+    
+    /**
      * Render polygon(s) here
      * @param graphics Object used to draw block
      * @param renderIndex The way we want to render our block
@@ -315,6 +451,7 @@ public final class Block extends Cell implements Disposable
         {
             case CustomMenu.RENDER_ISOMETRIC_1:
             case CustomMenu.RENDER_ISOMETRIC_2:
+            case CustomMenu.RENDER_ISOMETRIC_3:
                 //set block color and fill shape
                 graphics.setColor(getColor());
 

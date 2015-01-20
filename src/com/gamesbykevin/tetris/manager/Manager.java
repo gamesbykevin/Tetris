@@ -133,10 +133,6 @@ public final class Manager implements IManager
                     engine.getResources().playGameAudio(GameAudio.Keys.Music5, true);
                     break;
                     
-                case CustomMenu.GAME_MUSIC_6:
-                    engine.getResources().playGameAudio(GameAudio.Keys.Music6, true);
-                    break;
-                    
                 case CustomMenu.GAME_MUSIC_OFF:
                     //don't play anything
                     break;

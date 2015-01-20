@@ -18,7 +18,7 @@ public final class GameAudio extends AudioManager
     {
         Clear, Move, Place, Rotate,
         
-        Music1, Music2, Music3, Music4, Music5, Music6, 
+        Music1, Music2, Music3, Music4, Music5, 
         
         Win, Lose, Countdown
     }

@@ -37,7 +37,7 @@ public final class Board extends Sprite implements Disposable
     private int lines = 0;
     
     //the background of the board for 2d and isometric
-    private Polygon background2d, backgroundIso1, backgroundIso2;
+    private Polygon background2d, backgroundIso1, backgroundIso2, backgroundIso3;
     
     //the range for the board outline
     private static final int ISOMETRIC1_MIN_COL = 0;
@@ -51,6 +51,12 @@ public final class Board extends Sprite implements Disposable
     private static final int ISOMETRIC2_MIN_ROW = -2;
     private static final int ISOMETRIC2_MAX_ROW = Board.ROWS - 3;
 
+    //the range for the board outline
+    private static final double ISOMETRIC3_MIN_COL = .75;
+    private static final double ISOMETRIC3_MAX_COL = Board.COLS + .75;
+    private static final double ISOMETRIC3_MIN_ROW = -1.5;
+    private static final double ISOMETRIC3_MAX_ROW = Board.ROWS - 1.25;
+    
     public Board()
     {
         //create a new board
@@ -124,7 +130,7 @@ public final class Board extends Sprite implements Disposable
     
     /**
      * Add the piece to the board where there isn't a block.<br>
-     * This is used to add the last piece before a player has gameover
+     * This is used to add the last piece before a player has game over
      * @param piece The piece we want to add
      */
     public void fillPiece(final Piece piece)
@@ -551,7 +557,8 @@ public final class Board extends Sprite implements Disposable
         board = null;
         background2d = null;
         backgroundIso1 = null;
-        backgroundIso2= null;
+        backgroundIso2 = null;
+        backgroundIso3 = null;
     }
     
     /**
@@ -567,6 +574,9 @@ public final class Board extends Sprite implements Disposable
         
         if (this.backgroundIso2 == null)
             this.backgroundIso2 = new Polygon();
+        
+        if (this.backgroundIso3 == null)
+            this.backgroundIso3 = new Polygon();
         
             //setup 2d background coordinates
             this.background2d.reset();
@@ -588,6 +598,13 @@ public final class Board extends Sprite implements Disposable
             this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MAX_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MAX_COL, ISOMETRIC2_MIN_ROW)));
             this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MAX_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MAX_COL, ISOMETRIC2_MAX_ROW)));
             this.backgroundIso2.addPoint((int)(getX() + Block.getIsometric2X(ISOMETRIC2_MIN_COL)), (int)(getY() + Block.getIsometric2Y(ISOMETRIC2_MIN_COL, ISOMETRIC2_MAX_ROW)));
+            
+            //setup isometric 3 coordinates
+            this.backgroundIso3.reset();
+            this.backgroundIso3.addPoint((int)(getX() + Block.getIsometric3X(ISOMETRIC3_MIN_COL)), (int)(getY() + Block.getIsometric3Y(ISOMETRIC3_MIN_COL, ISOMETRIC3_MIN_ROW)));
+            this.backgroundIso3.addPoint((int)(getX() + Block.getIsometric3X(ISOMETRIC3_MAX_COL)), (int)(getY() + Block.getIsometric3Y(ISOMETRIC3_MAX_COL, ISOMETRIC3_MIN_ROW)));
+            this.backgroundIso3.addPoint((int)(getX() + Block.getIsometric3X(ISOMETRIC3_MAX_COL)), (int)(getY() + Block.getIsometric3Y(ISOMETRIC3_MAX_COL, ISOMETRIC3_MAX_ROW)));
+            this.backgroundIso3.addPoint((int)(getX() + Block.getIsometric3X(ISOMETRIC3_MIN_COL)), (int)(getY() + Block.getIsometric3Y(ISOMETRIC3_MIN_COL, ISOMETRIC3_MAX_ROW)));
     }
     
     /**
@@ -620,6 +637,13 @@ public final class Board extends Sprite implements Disposable
                 graphics.setColor(Color.WHITE);
                 graphics.drawPolygon(backgroundIso2);
                 break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_3:
+                graphics.setColor(Color.BLACK);
+                graphics.fillPolygon(backgroundIso3);
+                graphics.setColor(Color.WHITE);
+                graphics.drawPolygon(backgroundIso3);
+                break;
         }
         
         //render the board accordingly
@@ -634,8 +658,8 @@ public final class Board extends Sprite implements Disposable
                         if (hasBlock(col, row))
                         {
                             //calculate coordinates, 2d coordinates.
-                            int x = (int)(getX() + (col * Block.WIDTH));
-                            int y = (int)(getY() + (row * Block.HEIGHT));
+                            int x = (int)(getX() + Block.get2dX(col));
+                            int y = (int)(getY() + Block.get2dY(row));
 
                             //draw block
                             getBlock(col, row).render2d(graphics, x, y);
@@ -677,6 +701,25 @@ public final class Board extends Sprite implements Disposable
                             
                             //draw block
                             getBlock(col, row).renderIsometric2(graphics, x, y);
+                        }
+                    }
+                }
+                break;
+                
+            case CustomMenu.RENDER_ISOMETRIC_3:
+                for (int col = 0; col < board[0].length; col++)
+                {
+                    for (int row = board.length - 1; row >= 0; row--)
+                    {
+                        //only draw a block if we have one
+                        if (hasBlock(col, row))
+                        {
+                            //calculate coordinates for isometric
+                            int x = (int)(getX() + Block.getIsometric3X(col));
+                            int y = (int)(getY() + Block.getIsometric3Y(col, row));
+                            
+                            //draw block
+                            getBlock(col, row).renderIsometric3(graphics, x, y);
                         }
                     }
                 }

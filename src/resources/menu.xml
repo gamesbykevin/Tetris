@@ -74,6 +74,7 @@
             <option>2-D</option>
             <option>Isometric 1</option>
             <option>Isometric 2</option>
+            <option>Isometric 3</option>
         </options>
         <options name="Music: " id="Music">
             <option>Song 1</option>
@@ -81,7 +82,6 @@
             <option>Song 3</option>
             <option>Song 4</option>
             <option>Song 5</option>
-            <option>Song 6</option>
             <option>Off</option>
         </options>
         <options name="All Sound: " id="Sound">
@@ -134,6 +134,7 @@
             <option>2D</option>
             <option>Isometric 1</option>
             <option>Isometric 2</option>
+            <option>Isometric 3</option>
         </options>
         <options name="All Sound: " id="Sound">
             <option>On</option>

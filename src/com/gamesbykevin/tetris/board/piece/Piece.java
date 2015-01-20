@@ -41,7 +41,7 @@ public final class Piece extends Sprite implements Disposable
     public static final Color PIECE_ONE_COLOR = Color.BLUE;
     public static final Color PIECE_TWO_COLOR = Color.CYAN;
     public static final Color PIECE_THREE_COLOR = Color.GRAY;
-    public static final Color PIECE_FOUR_COLOR = Color.YELLOW;
+    public static final Color PIECE_FOUR_COLOR = Color.MAGENTA;
     public static final Color PIECE_FIVE_COLOR = Color.GREEN;
     public static final Color PIECE_SIX_COLOR = Color.ORANGE;
     public static final Color PIECE_SEVEN_COLOR = Color.RED;
@@ -360,6 +360,7 @@ public final class Piece extends Sprite implements Disposable
                         break;
                         
                     case CustomMenu.RENDER_ISOMETRIC_2:
+                    case CustomMenu.RENDER_ISOMETRIC_3:
                         if (block1.getRow() < block2.getRow() || block1.getRow() <= block2.getRow() && block1.getCol() > block2.getCol())
                         {
                             //swap objects
@@ -401,8 +402,8 @@ public final class Piece extends Sprite implements Disposable
             {
                 case CustomMenu.RENDER_2D:
                     //2d coordinates of this block
-                    startX = x + (block.getCol() * Block.WIDTH);
-                    startY = y + (block.getRow() * Block.HEIGHT);
+                    startX = x + Block.get2dX(block);
+                    startY = y + Block.get2dY(block);
 
                     //draw block
                     block.render2d(graphics, (int)startX, (int)startY);
@@ -426,6 +427,14 @@ public final class Piece extends Sprite implements Disposable
                     block.renderIsometric2(graphics, startX, startY);
                     break;
                     
+                case CustomMenu.RENDER_ISOMETRIC_3:
+                    //isometric coordinates
+                    startX = x + Block.getIsometric3X(block);
+                    startY = y + Block.getIsometric3Y(block);
+
+                    //draw block
+                    block.renderIsometric3(graphics, startX, startY);
+                    break;
             }
         }
     }

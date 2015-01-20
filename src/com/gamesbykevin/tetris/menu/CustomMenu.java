@@ -69,6 +69,7 @@ public final class CustomMenu extends Menu implements IElement
     public static final int RENDER_2D = 0;
     public static final int RENDER_ISOMETRIC_1 = 1;
     public static final int RENDER_ISOMETRIC_2 = 2;
+    public static final int RENDER_ISOMETRIC_3 = 3;
     
     //different game modes
     public static final int GAME_MODE_NORMAL = 0;
@@ -89,8 +90,7 @@ public final class CustomMenu extends Menu implements IElement
     public static final int GAME_MUSIC_3 = 2;
     public static final int GAME_MUSIC_4 = 3;
     public static final int GAME_MUSIC_5 = 4;
-    public static final int GAME_MUSIC_6 = 5;
-    public static final int GAME_MUSIC_OFF = 6;
+    public static final int GAME_MUSIC_OFF = 5;
     
     //here the images for the mouse cursor will be contained
     private ImageManager images;

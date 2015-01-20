@@ -39,7 +39,7 @@ public final class Players implements Disposable, IElement
     
     //the reward/penalty (for tug of war mode)
     private static final int TUG_OF_WAR_REWARD = 1;
-    private static final int TUG_OF_WAR_PENALTY = -4;
+    private static final int TUG_OF_WAR_PENALTY = -3;
     
     //the maximum number of players allowed in the game
     private static final int PLAYER_LIMIT = 2;
@@ -165,6 +165,7 @@ public final class Players implements Disposable, IElement
             {
                 case CustomMenu.RENDER_2D:
                 case CustomMenu.RENDER_ISOMETRIC_2:
+                case CustomMenu.RENDER_ISOMETRIC_3:
                     player.getBoard().setLocation(player.getX() + PLAYER_START_X_2D, player.getY() + PLAYER_START_Y_2D);
                     break;
                     
