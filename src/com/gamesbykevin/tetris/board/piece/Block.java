@@ -7,6 +7,7 @@ import com.gamesbykevin.tetris.menu.CustomMenu;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.util.UUID;
 
 /**
  * This is a Tetris block.<br> 
@@ -27,7 +28,7 @@ public final class Block extends Cell implements Disposable
     private Color color;
     
     //all blocks that are part of the same piece will have the same id
-    private long id;
+    private UUID id;
     
     //these polygon objects are for the isometric blocks
     private Polygon topSide;
@@ -41,7 +42,7 @@ public final class Block extends Cell implements Disposable
      * @param color Color of block
      * @param id The id, all blocks that are part of the same piece will have the same id
      */
-    protected Block(final int col, final int row, final Color color, final long id)
+    protected Block(final int col, final int row, final Color color, final UUID id)
     {
         //call to parent constructor
         super(col, row);
@@ -58,12 +59,12 @@ public final class Block extends Cell implements Disposable
      * All blocks that are part of the same piece will have the same id.
      * @return The id of the piece this block belongs to.
      */
-    public long getId()
+    public UUID getId()
     {
         return this.id;
     }
     
-    private void setId(final long id)
+    private void setId(final UUID id)
     {
         this.id = id;
     }
